@@ -1,0 +1,73 @@
+{% extends "staff_base.html" %}
+{% block title %}Visas{% endblock %}
+{% block content %}
+<div class="page-head">
+  <h1>Visas</h1>
+  <p class="muted">Search and filter. Supervisor+: approve or reject pending visas.</p>
+</div>
+<div class="card">
+  <form class="filters" method="get">
+    <div class="field"><label for="q">Search</label><input id="q" name="q" value="{{ q or '' }}" placeholder="Visa ID or destination"></div>
+    <div class="field"><label for="status">Status</label>
+      <select id="status" name="status">
+        <option value="">Any</option>
+        {% for s in ['pending','approved','rejected'] %}
+        <option value="{{ s }}" {% if status==s %}selected{% endif %}>{{ s }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="field"><label for="visa_type">Type</label>
+      <select id="visa_type" name="visa_type">
+        <option value="">Any</option>
+        {% for t in ['tourist','work','student','transit','diplomatic'] %}
+        <option value="{{ t }}" {% if visa_type==t %}selected{% endif %}>{{ t }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="field"><label>&nbsp;</label><button class="btn btn-primary" type="submit">Filter</button></div>
+  </form>
+  <div class="filter-meta">
+    <span class="muted">{{ rows|length }} result{{ 's' if rows|length != 1 else '' }}</span>
+    <a href="{{ url_for('staff_visas') }}">Clear filters</a>
+  </div>
+  <div class="table-scroll">
+  <table>
+    <thead><tr><th>ID</th><th>Citizen</th><th>Type</th><th>Destination</th><th>Passport</th><th>Status</th><th>Actions</th></tr></thead>
+    <tbody>
+    {% for v in rows %}
+    <tr>
+      <td>{{ v.visa_id }}</td>
+      <td>{{ v.fname }} {{ v.lname }}</td>
+      <td>{{ v.visa_type }}</td>
+      <td>{{ v.destination }}</td>
+      <td>{{ v.passport_id }}</td>
+      <td><span class="badge badge-{{ v.status }}">{{ v.status }}</span></td>
+      <td>
+        <div class="actions-stack">
+        {% if v.status == 'pending' and role_rank >= 3 %}
+        <form method="post" action="{{ url_for('staff_visa_status', visa_id=v.visa_id) }}">
+          <input type="hidden" name="status" value="approved">
+          <input type="hidden" name="next" value="visas">
+          <button class="btn btn-primary btn-sm" type="submit">Approve</button>
+        </form>
+        <form method="post" action="{{ url_for('staff_visa_status', visa_id=v.visa_id) }}" onsubmit="return confirm('Reject this visa application?');">
+          <input type="hidden" name="status" value="rejected">
+          <input type="hidden" name="next" value="visas">
+          <button class="btn btn-warn btn-sm" type="submit">Reject</button>
+        </form>
+        {% elif v.status == 'pending' %}
+        <span class="muted">{% if role_rank >= 2 %}Awaiting supervisor{% else %}View only{% endif %}</span>
+        {% else %}
+        <span class="muted">Finalized</span>
+        {% endif %}
+        </div>
+      </td>
+    </tr>
+    {% else %}
+    <tr><td colspan="7">No visas found.</td></tr>
+    {% endfor %}
+    </tbody>
+  </table>
+  </div>
+</div>
+{% endblock %}

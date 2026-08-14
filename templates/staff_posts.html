@@ -1,0 +1,56 @@
+{% extends "staff_base.html" %}
+{% block title %}Border posts{% endblock %}
+{% block content %}
+<div class="page-head">
+  <h1>Border posts</h1>
+  <p class="muted">{% if role_rank >= 4 %}Admin can add, edit, or delete unused posts.{% else %}Read-only list.{% endif %}</p>
+</div>
+{% if role_rank >= 4 %}
+<div class="card">
+  <h2>{{ 'Edit post #' ~ edit_post.post_id if edit_post else 'Add border post' }}</h2>
+  <form method="post" action="{{ url_for('staff_posts') }}" class="form-grid" style="margin-top:12px;">
+    <input type="hidden" name="action" value="{{ 'update' if edit_post else 'create' }}">
+    <div><label>Post ID</label><input name="post_id" type="number" required value="{{ edit_post.post_id if edit_post else '' }}" {% if edit_post %}readonly{% endif %}></div>
+    <div><label>Name</label><input name="border_name" required value="{{ edit_post.border_name if edit_post else '' }}"></div>
+    <div><label>Type</label>
+      <select name="post_type" required>
+        {% for t in ['air','land','sea'] %}
+        <option value="{{ t }}" {% if edit_post and edit_post.post_type==t %}selected{% endif %}>{{ t }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div><label>Region</label><input name="region" value="{{ edit_post.region if edit_post else '' }}"></div>
+    <div class="full"><button class="btn btn-primary" type="submit">{{ 'Update' if edit_post else 'Create' }}</button>
+      {% if edit_post %}<a class="btn" href="{{ url_for('staff_posts') }}">Cancel</a>{% endif %}
+    </div>
+  </form>
+</div>
+{% endif %}
+<div class="card">
+  <table>
+    <thead><tr><th>ID</th><th>Name</th><th>Type</th><th>Region</th>{% if role_rank >= 4 %}<th></th>{% endif %}</tr></thead>
+    <tbody>
+    {% for post in rows %}
+    <tr>
+      <td>{{ post.post_id }}</td>
+      <td>{{ post.border_name }}</td>
+      <td>{{ post.post_type }}</td>
+      <td>{{ post.region or '—' }}</td>
+      {% if role_rank >= 4 %}
+      <td class="actions">
+        <a class="btn" href="{{ url_for('staff_posts', edit=post.post_id) }}">Edit</a>
+        <form method="post" action="{{ url_for('staff_posts') }}" onsubmit="return confirm('Delete this post?');">
+          <input type="hidden" name="action" value="delete">
+          <input type="hidden" name="post_id" value="{{ post.post_id }}">
+          <button class="btn btn-warn" type="submit">Delete</button>
+        </form>
+      </td>
+      {% endif %}
+    </tr>
+    {% else %}
+    <tr><td colspan="5">No posts.</td></tr>
+    {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

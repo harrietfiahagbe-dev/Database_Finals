@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+{% block title %}NPIMS — Eligibility & fees{% endblock %}
+{% block content %}
+<main class="page-main">
+  <div class="wrap-narrow">
+    <div class="page-head">
+      <h1>Eligibility &amp; fees</h1>
+      <p>Short reference for passport validity and fee amounts used in NPIMS.</p>
+    </div>
+    <div class="q-card">
+      <h2>Who can apply</h2>
+      <ul>
+        <li>Ghanaian citizens with a valid 9-digit national ID (Ghana Card).</li>
+        <li>One passport application may be pending or processing at a time.</li>
+        <li>Visa applications require an existing issued passport on file.</li>
+      </ul>
+    </div>
+    <div class="q-card">
+      <h2>Passport validity</h2>
+      <p>Ordinary passports are typically issued for up to 10 years. Renew early if expiry is within 90 days — staff reports list passports nearing expiry.</p>
+    </div>
+    <div class="q-card">
+      <h2>Passport fees</h2>
+      <table>
+        <thead><tr><th>Type</th><th>Amount (GHS)</th></tr></thead>
+        <tbody>
+          <tr><td>Ordinary</td><td>150.00</td></tr>
+          <tr><td>Official</td><td>250.00</td></tr>
+          <tr><td>Diplomatic</td><td>300.00</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="q-card">
+      <h2>Visa fees</h2>
+      <table>
+        <thead><tr><th>Type</th><th>Amount (GHS)</th></tr></thead>
+        <tbody>
+          <tr><td>Tourist</td><td>100.00</td></tr>
+          <tr><td>Student</td><td>120.00</td></tr>
+          <tr><td>Work</td><td>150.00</td></tr>
+          <tr><td>Diplomatic</td><td>200.00</td></tr>
+          <tr><td>Transit</td><td>80.00</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</main>
+{% endblock %}

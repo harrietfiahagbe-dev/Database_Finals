@@ -1,0 +1,465 @@
+{% extends "base.html" %}
+{% block title %}NPIMS — Sign up / Log in{% endblock %}
+{% block body_class %}auth-page{% endblock %}
+{% block extra_css %}
+<style>
+  .auth-shell {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    min-height: calc(100vh - 72px);
+  }
+
+  @media (max-width: 860px) {
+    .auth-shell {
+      grid-template-columns: 1fr;
+    }
+    .auth-side {
+      min-height: 260px;
+    }
+  }
+
+  .auth-side {
+    background: radial-gradient(900px 500px at 20% 0%, #234f3c 0%, var(--forest) 45%, var(--forest-deep) 100%);
+    color: var(--cream);
+    padding: 56px 48px;
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+  }
+
+  .auth-side .top {
+    position: relative;
+    z-index: 2;
+  }
+
+  .coa-lg {
+    width: 64px;
+    height: 64px;
+    margin-bottom: 18px;
+  }
+
+  .auth-side .eyebrow {
+    font-size: 11.5px;
+    color: var(--gold);
+    margin-bottom: 10px;
+  }
+
+  .auth-side h1 {
+    font-size: 30px;
+    line-height: 1.15;
+    max-width: 340px;
+    margin-bottom: 14px;
+    color: var(--cream);
+  }
+
+  .auth-side p {
+    font-size: 14px;
+    color: #D9D2BE;
+    max-width: 320px;
+  }
+
+  .adinkra-field {
+    position: absolute;
+    inset: 0;
+    opacity: .14;
+    pointer-events: none;
+  }
+
+  .adinkra-field svg {
+    position: absolute;
+    stroke: var(--gold);
+    fill: none;
+    stroke-width: 1.5;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  .ad1 {
+    width: 150px;
+    height: 150px;
+    bottom: 8%;
+    right: -10px;
+    animation: driftA 14s ease-in-out infinite;
+  }
+
+  .ad2 {
+    width: 90px;
+    height: 90px;
+    top: 14%;
+    right: 20%;
+    animation: driftB 10s ease-in-out infinite;
+  }
+
+  @keyframes driftA {
+    0%, 100% { transform: translateY(0) rotate(0deg); }
+    50% { transform: translateY(-14px) rotate(4deg); }
+  }
+
+  @keyframes driftB {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(12px); }
+  }
+
+  .auth-side .caption {
+    position: relative;
+    z-index: 2;
+    font-size: 12px;
+    color: #C9C2AC;
+    border-top: 1px solid rgba(247, 243, 236, .2);
+    padding-top: 16px;
+  }
+
+  .form-col {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 56px 32px;
+  }
+
+  .auth-card {
+    width: 100%;
+    max-width: 420px;
+    margin-bottom: 0;
+    box-shadow: none;
+    border: none;
+    background: transparent;
+    padding: 0;
+  }
+
+  .tabs {
+    display: flex;
+    gap: 4px;
+    background: var(--cream-2);
+    border-radius: 10px;
+    padding: 4px;
+    margin-bottom: 28px;
+  }
+
+  .tab {
+    flex: 1;
+    text-align: center;
+    padding: 10px 0;
+    border-radius: 7px;
+    font-size: 12.5px;
+    font-weight: 500;
+    cursor: pointer;
+    color: var(--ink-soft);
+    border: none;
+    background: none;
+    font-family: inherit;
+  }
+
+  .tab.active {
+    background: #fff;
+    color: var(--forest);
+    box-shadow: var(--shadow-sm);
+  }
+
+  .auth-card h2 {
+    font-size: 24px;
+    color: var(--forest);
+    margin-bottom: 6px;
+  }
+
+  .auth-card .lede {
+    font-size: 13.5px;
+    color: var(--ink-soft);
+    margin-bottom: 28px;
+  }
+
+  #form-signup,
+  #form-login {
+    display: none;
+  }
+
+  #form-signup.active,
+  #form-login.active {
+    display: block;
+  }
+
+  #form-signup.hidden,
+  #form-login.hidden {
+    display: none !important;
+  }
+
+  .auth-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+  }
+
+  .field label .req {
+    color: var(--clay);
+  }
+
+  .switch-line {
+    text-align: center;
+    font-size: 13px;
+    color: var(--ink-soft);
+    margin-top: 18px;
+  }
+
+  .switch-line button {
+    background: none;
+    border: none;
+    color: var(--clay);
+    font-weight: 500;
+    cursor: pointer;
+    font-family: inherit;
+    font-size: 13px;
+  }
+
+  .disclaimer {
+    font-size: 11.5px;
+    color: var(--ink-soft);
+    margin-top: 20px;
+    line-height: 1.5;
+  }
+
+  .login-as-toggle {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 2px;
+  }
+
+  .las {
+    flex: 1;
+    padding: 9px 0;
+    border-radius: 8px;
+    border: 1px solid var(--line);
+    background: #fff;
+    color: var(--ink-soft);
+    font-family: inherit;
+    font-size: 12.5px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all .15s ease;
+  }
+
+  .las:hover {
+    border-color: var(--forest);
+  }
+
+  .las.active {
+    background: var(--forest);
+    color: var(--cream);
+    border-color: var(--forest);
+  }
+
+  .intent-banner {
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+    background: var(--cream-2);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 12px 14px;
+    margin-bottom: 22px;
+    font-size: 12px;
+    color: var(--ink-soft);
+  }
+
+  .intent-banner svg {
+    width: 16px;
+    height: 16px;
+    color: var(--clay);
+    flex: none;
+    margin-top: 1px;
+  }
+
+  @media (max-width: 520px) {
+    .auth-row {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="auth-shell">
+  <div class="auth-side">
+    <div class="adinkra-field" aria-hidden="true">
+      <svg class="ad1" viewBox="0 0 100 100">
+        <path d="M50 12 C34 12 24 24 24 38 C24 50 34 56 42 58 C34 60 26 66 26 76" />
+        <path d="M50 12 C66 12 76 24 76 38 C76 50 66 56 58 58 C66 60 74 66 74 76" />
+        <circle cx="50" cy="46" r="7" />
+      </svg>
+      <svg class="ad2" viewBox="0 0 100 100">
+        <path d="M30 80 C30 55 40 40 60 35 C70 33 76 24 72 14 C68 20 60 22 54 18" />
+        <circle cx="70" cy="15" r="4" />
+        <path d="M30 80 L20 80 M30 80 C24 74 24 66 30 62" />
+      </svg>
+    </div>
+    <div class="top">
+      <svg class="coa-lg" viewBox="0 0 40 40" aria-hidden="true">
+        <circle cx="20" cy="20" r="18" fill="none" stroke="#C9973F" stroke-width="1.2" />
+        <polygon points="20,9 22.5,17 31,17 24,22 26.5,30 20,25 13.5,30 16,22 9,17 17.5,17" fill="#F7F3EC" />
+      </svg>
+      <div class="eyebrow caps">Official government portal</div>
+      <h1>Akwaaba. One account for every application.</h1>
+      <p>Register once with your Ghana Card number, then apply for a passport or visa, record your fee in NPIMS, and track your
+        status — all from the same place.</p>
+    </div>
+    <div class="caption caps">Ministry of Foreign Affairs &middot; Ghana Immigration Service</div>
+  </div>
+
+  <div class="form-col">
+    <div class="auth-card">
+      <div class="tabs">
+        <button class="tab caps{% if mode != 'login' %} active{% endif %}" id="tab-signup" type="button" onclick="showForm('signup')">Sign up</button>
+        <button class="tab caps{% if mode == 'login' %} active{% endif %}" id="tab-login" type="button" onclick="showForm('login')">Log in</button>
+      </div>
+
+      <div class="intent-banner" id="intentBanner"{% if intent not in ['passport', 'visa'] %} style="display:none;"{% endif %}>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6">
+          <circle cx="12" cy="12" r="9" />
+          <line x1="12" y1="8" x2="12" y2="13" />
+          <line x1="12" y1="16" x2="12.01" y2="16" />
+        </svg>
+        <span id="intentBannerText">
+          {% if intent == 'passport' %}You're continuing toward a passport application.
+          {% elif intent == 'visa' %}You're continuing toward a visa application.
+          {% endif %}
+        </span>
+      </div>
+
+      <form id="form-signup" class="active{% if mode == 'login' %} hidden{% endif %}" action="{{ url_for('signup') }}"
+        method="post">
+        <input type="hidden" name="intent" value="{{ intent or '' }}">
+        <input type="hidden" name="next" value="{{ next or '' }}">
+        <h2>Create your account</h2>
+        <p class="lede">Your Ghana Card number is how the system links every application to you.</p>
+
+        <div class="field">
+          <label>National ID number <span class="req">*</span></label>
+          <input type="text" name="national_id" inputmode="numeric" pattern="[0-9]{9}" maxlength="9"
+            placeholder="100000031" required>
+          <div class="hint">9-digit Ghana Card number — this becomes your permanent record ID.</div>
+        </div>
+
+        <div class="auth-row">
+          <div class="field">
+            <label>First name <span class="req">*</span></label>
+            <input type="text" name="fname" placeholder="Kwame" required>
+          </div>
+          <div class="field">
+            <label>Last name <span class="req">*</span></label>
+            <input type="text" name="lname" placeholder="Mensah" required>
+          </div>
+        </div>
+
+        <div class="auth-row">
+          <div class="field">
+            <label>Date of birth <span class="req">*</span></label>
+            <input type="date" name="date_of_birth" required>
+          </div>
+          <div class="field">
+            <label>Gender <span class="req">*</span></label>
+            <select name="gender" required>
+              <option value="" disabled selected>Select</option>
+              <option value="M">Male</option>
+              <option value="F">Female</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="field">
+          <label>Email</label>
+          <input type="email" name="email" placeholder="you@example.com">
+          <div class="hint">Optional — used for application updates.</div>
+        </div>
+
+        <div class="field">
+          <label>Home address <span class="req">*</span></label>
+          <input type="text" name="home_address" placeholder="GA-492-8931" required>
+        </div>
+
+        <div class="auth-row">
+          <div class="field">
+            <label>Password <span class="req">*</span></label>
+            <input type="password" name="password" placeholder="Enter password" required minlength="6">
+          </div>
+          <div class="field">
+            <label>Confirm password <span class="req">*</span></label>
+            <input type="password" name="confirm_password" placeholder="Re-enter password" required minlength="6">
+          </div>
+        </div>
+
+        <button class="btn btn-primary btn-block caps" type="submit">Create account</button>
+        <p class="disclaimer">By creating an account, you confirm the details provided are accurate and belong to you.
+          Providing false information may result in application rejection.</p>
+      </form>
+
+      <form id="form-login" class="{% if mode == 'login' %}active{% else %}hidden{% endif %}" action="{{ url_for('login') }}"
+        method="post">
+        <input type="hidden" name="account_type" id="accountTypeInput" value="citizen">
+        <input type="hidden" name="intent" value="{{ intent or '' }}">
+        <input type="hidden" name="next" value="{{ next or '' }}">
+        <h2>Welcome back</h2>
+        <p class="lede">Log in to continue an application or check your status.</p>
+
+        <div class="field">
+          <label>Logging in as</label>
+          <div class="login-as-toggle">
+            <button type="button" class="las active" id="las-citizen" onclick="setLoginAs('citizen')">Citizen</button>
+            <button type="button" class="las" id="las-staff" onclick="setLoginAs('staff')">Immigration staff</button>
+          </div>
+          <div class="hint" id="loginAsHint">Your account was created when you signed up.</div>
+        </div>
+
+        <div class="field">
+          <label>National ID / officer ID or email <span class="req">*</span></label>
+          <input type="text" name="login_id" placeholder="100000002, officer ID, or email" autocomplete="username" required>
+          <div class="hint">Citizens: Ghana Card number or email. Staff: officer ID.</div>
+        </div>
+
+        <div class="field">
+          <label>Password <span class="req">*</span></label>
+          <input type="password" name="password" placeholder="Enter password" required>
+        </div>
+
+        <button class="btn btn-primary btn-block caps" type="submit">Log in</button>
+      </form>
+
+      <p class="switch-line" id="bottom-switch" style="display: {{ 'block' if mode != 'login' else 'none' }};">
+        Already have an account? <button type="button" onclick="showForm('login')">Log in</button>
+      </p>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+  function showForm(which) {
+    const isSignup = which === 'signup';
+    document.getElementById('form-signup').classList.toggle('active', isSignup);
+    document.getElementById('form-signup').classList.toggle('hidden', !isSignup);
+    document.getElementById('form-login').classList.toggle('active', !isSignup);
+    document.getElementById('form-login').classList.toggle('hidden', isSignup);
+    document.getElementById('tab-signup').classList.toggle('active', isSignup);
+    document.getElementById('tab-login').classList.toggle('active', !isSignup);
+    document.getElementById('bottom-switch').style.display = isSignup ? 'block' : 'none';
+  }
+
+  let loginAs = 'citizen';
+  function setLoginAs(which) {
+    loginAs = which;
+    document.getElementById('accountTypeInput').value = which;
+    document.getElementById('las-citizen').classList.toggle('active', which === 'citizen');
+    document.getElementById('las-staff').classList.toggle('active', which === 'staff');
+    document.getElementById('loginAsHint').textContent = which === 'staff'
+      ? 'Officer, senior officer, supervisor, and admin accounts are issued by an administrator, not self-registered.'
+      : 'Your account was created when you signed up.';
+  }
+
+  document.addEventListener('DOMContentLoaded', function () {
+    if ('{{ mode }}' === 'login') {
+      showForm('login');
+      setLoginAs('citizen');
+    }
+  });
+</script>
+{% endblock %}

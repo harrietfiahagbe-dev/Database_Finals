@@ -1,0 +1,55 @@
+{% extends "staff_base.html" %}
+{% block title %}Payments{% endblock %}
+{% block content %}
+<div class="page-head">
+  <h1>Payments</h1>
+  <p class="muted">Read-only payment records from NPIMS.</p>
+</div>
+<div class="card">
+  <form class="filters" method="get">
+    <div class="field"><label for="q">Search</label><input id="q" name="q" value="{{ q or '' }}" placeholder="National ID / passport / visa ID"></div>
+    <div class="field"><label for="status">Status</label>
+      <select id="status" name="status">
+        <option value="">Any</option>
+        {% for s in ['pending','completed','failed'] %}
+        <option value="{{ s }}" {% if status==s %}selected{% endif %}>{{ s }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="field"><label for="payment_method">Method</label>
+      <select id="payment_method" name="payment_method">
+        <option value="">Any</option>
+        {% for m in ['mobile money','card','cash'] %}
+        <option value="{{ m }}" {% if payment_method==m %}selected{% endif %}>{{ m }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="field"><label>&nbsp;</label><button class="btn btn-primary" type="submit">Filter</button></div>
+  </form>
+  <div class="filter-meta">
+    <span class="muted">{{ rows|length }} result{{ 's' if rows|length != 1 else '' }}</span>
+    <a href="{{ url_for('staff_payments') }}">Clear filters</a>
+  </div>
+  <div class="table-scroll">
+  <table>
+    <thead><tr><th>ID</th><th>Citizen</th><th>Passport</th><th>Visa</th><th>Amount</th><th>Method</th><th>Date</th><th>Status</th></tr></thead>
+    <tbody>
+    {% for p in rows %}
+    <tr>
+      <td>{{ p.payment_id }}</td>
+      <td>{{ p.nat_idcard }}</td>
+      <td>{{ p.passport_id or '—' }}</td>
+      <td>{{ p.visa_id or '—' }}</td>
+      <td>GH₵ {{ '%.2f'|format(p.amount) }}</td>
+      <td>{{ p.payment_method }}</td>
+      <td>{{ p.payment_date }}</td>
+      <td><span class="badge badge-{{ p.status }}">{{ p.status }}</span></td>
+    </tr>
+    {% else %}
+    <tr><td colspan="8">No payments found.</td></tr>
+    {% endfor %}
+    </tbody>
+  </table>
+  </div>
+</div>
+{% endblock %}

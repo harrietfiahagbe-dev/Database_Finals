@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+{% block title %}NPIMS — Track application{% endblock %}
+{% block content %}
+<main class="page-main">
+  <div class="wrap">
+    <div class="page-head">
+      <p class="muted" style="text-transform:uppercase;letter-spacing:.07em;font-size:11px;color:var(--clay);margin-bottom:6px;">Track</p>
+      <h1>Your applications</h1>
+      <p>Search by passport ID or visa ID, or leave blank to see everything tied to your national ID.</p>
+    </div>
+    <form class="filters" method="get" action="{{ url_for('track') }}" style="margin-bottom:28px;">
+      <div class="field" style="flex:1;min-width:200px;">
+        <label for="q">Search</label>
+        <input id="q" type="text" name="q" value="{{ q or '' }}" placeholder="e.g. G0100002 or 21">
+      </div>
+      <div class="field">
+        <label>&nbsp;</label>
+        <button class="btn btn-primary" type="submit">Search</button>
+      </div>
+    </form>
+
+    <div class="card">
+      <h2 style="font-size:18px;margin-bottom:12px;">Passports</h2>
+      <div class="table-scroll">
+        <table class="data">
+          <thead><tr><th>ID</th><th>Type</th><th>Issue</th><th>Expiry</th><th>Status</th></tr></thead>
+          <tbody>
+            {% for p in results.passports %}
+            <tr>
+              <td>{{ p.passport_id }}</td>
+              <td>{{ p.passport_type }}</td>
+              <td>{{ p.issue_date or '—' }}</td>
+              <td>{{ p.expiry_date or '—' }}</td>
+              <td><span class="badge badge-{{ p.status }}">{{ p.status }}</span></td>
+            </tr>
+            {% else %}
+            <tr><td colspan="5">No matching passports.</td></tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2 style="font-size:18px;margin-bottom:12px;">Visas</h2>
+      <div class="table-scroll">
+        <table class="data">
+          <thead><tr><th>ID</th><th>Type</th><th>Destination</th><th>Passport</th><th>Status</th></tr></thead>
+          <tbody>
+            {% for v in results.visas %}
+            <tr>
+              <td>{{ v.visa_id }}</td>
+              <td>{{ v.visa_type }}</td>
+              <td>{{ v.destination }}</td>
+              <td>{{ v.passport_id }}</td>
+              <td><span class="badge badge-{{ v.status }}">{{ v.status }}</span></td>
+            </tr>
+            {% else %}
+            <tr><td colspan="5">No matching visas.</td></tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</main>
+{% endblock %}

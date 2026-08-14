@@ -1,0 +1,82 @@
+{% extends "staff_base.html" %}
+{% block title %}Passports{% endblock %}
+{% block content %}
+<div class="page-head">
+  <h1>Passports</h1>
+  <p class="muted">Search and filter. Senior+: verify (processing) / reject. Supervisor+: approve via procedure.</p>
+</div>
+<div class="card">
+  <form class="filters" method="get">
+    <div class="field"><label for="q">Search</label><input id="q" name="q" value="{{ q or '' }}" placeholder="Passport ID or national ID"></div>
+    <div class="field"><label for="status">Status</label>
+      <select id="status" name="status">
+        <option value="">Any</option>
+        {% for s in ['pending','processing','approved','issued','rejected'] %}
+        <option value="{{ s }}" {% if status==s %}selected{% endif %}>{{ s }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="field"><label for="passport_type">Type</label>
+      <select id="passport_type" name="passport_type">
+        <option value="">Any</option>
+        {% for t in ['ordinary','official','diplomatic'] %}
+        <option value="{{ t }}" {% if passport_type==t %}selected{% endif %}>{{ t }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="field"><label>&nbsp;</label><button class="btn btn-primary" type="submit">Filter</button></div>
+  </form>
+  <div class="filter-meta">
+    <span class="muted">{{ rows|length }} result{{ 's' if rows|length != 1 else '' }}</span>
+    <a href="{{ url_for('staff_passports') }}">Clear filters</a>
+  </div>
+  <div class="table-scroll">
+  <table>
+    <thead><tr><th>ID</th><th>Citizen</th><th>Type</th><th>Status</th><th>Actions</th></tr></thead>
+    <tbody>
+    {% for p in rows %}
+    <tr>
+      <td>{{ p.passport_id }}</td>
+      <td>{{ p.fname }} {{ p.lname }} ({{ p.nat_idcard }})</td>
+      <td>{{ p.passport_type }}</td>
+      <td><span class="badge badge-{{ p.status }}">{{ p.status }}</span></td>
+      <td>
+        <div class="actions-stack">
+        {% if role_rank >= 2 and p.status == 'pending' %}
+        <form method="post" action="{{ url_for('staff_passport_status', passport_id=p.passport_id) }}">
+          <input type="hidden" name="status" value="processing">
+          <input type="hidden" name="next" value="passports">
+          <button class="btn btn-sm" type="submit">Verify docs</button>
+        </form>
+        {% endif %}
+        {% if role_rank >= 2 and p.status in ['pending','processing'] %}
+        <form method="post" action="{{ url_for('staff_passport_status', passport_id=p.passport_id) }}" onsubmit="return confirm('Reject this passport application?');">
+          <input type="hidden" name="status" value="rejected">
+          <input type="hidden" name="next" value="passports">
+          <button class="btn btn-warn btn-sm" type="submit">Reject</button>
+        </form>
+        {% endif %}
+        {% if role_rank >= 3 and p.status in ['pending','processing'] %}
+        <form method="post" action="{{ url_for('staff_passport_approve', passport_id=p.passport_id) }}">
+          <input type="hidden" name="next" value="passports">
+          <label class="checks"><input type="checkbox" name="fee_paid"> Fee paid</label>
+          <label class="checks"><input type="checkbox" name="biometric_captured"> Biometric</label>
+          <button class="btn btn-primary btn-sm" type="submit">Approve</button>
+        </form>
+        {% endif %}
+        {% if p.status not in ['pending','processing'] %}
+        <span class="muted">No actions</span>
+        {% elif role_rank < 2 %}
+        <span class="muted">View only</span>
+        {% endif %}
+        </div>
+      </td>
+    </tr>
+    {% else %}
+    <tr><td colspan="5">No passports found.</td></tr>
+    {% endfor %}
+    </tbody>
+  </table>
+  </div>
+</div>
+{% endblock %}

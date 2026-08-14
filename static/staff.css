@@ -1,0 +1,231 @@
+/* Staff portal layout — isolated from citizen chrome */
+
+body.staff-body {
+  background: var(--cream);
+  display: block;
+  min-height: 100vh;
+}
+
+body.staff-body .site-header {
+  backdrop-filter: none;
+}
+
+body.staff-body .staff-header .nav-row {
+  max-width: none;
+  width: 100%;
+  margin: 0;
+  padding: 14px 28px;
+  flex-wrap: nowrap;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+body.staff-body .brand-plain {
+  font-family: "Fraunces", serif;
+  font-weight: 600;
+  color: var(--forest);
+  font-size: 17px;
+  flex: none;
+}
+
+body.staff-body .staff-who {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 13px;
+  color: var(--ink-soft);
+  flex: none;
+  margin-left: auto;
+}
+
+body.staff-body .staff-who strong {
+  color: var(--forest);
+}
+
+body.staff-body .shell {
+  display: grid;
+  grid-template-columns: 220px minmax(0, 1fr);
+  align-items: stretch;
+  min-height: calc(100vh - 58px);
+  width: 100%;
+}
+
+body.staff-body .sidebar {
+  background: #fff;
+  border-right: 1px solid var(--line);
+  padding: 20px 14px;
+  min-width: 0;
+}
+
+body.staff-body .snav a {
+  display: block;
+  padding: 10px 12px;
+  border-radius: 8px;
+  font-size: 13px;
+  color: var(--ink-soft);
+  margin-bottom: 2px;
+  box-shadow: none;
+  border: none;
+  background: transparent;
+  min-height: 0;
+  text-align: left;
+  width: 100%;
+}
+
+body.staff-body .snav a:hover {
+  background: var(--cream-2);
+  color: var(--forest);
+  transform: none;
+  box-shadow: none;
+}
+
+body.staff-body .snav a.active {
+  background: var(--forest);
+  color: var(--cream);
+}
+
+body.staff-body .snav .grp {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--ink-soft);
+  padding: 14px 12px 6px;
+}
+
+body.staff-body .staff-main {
+  padding: 28px 32px 80px;
+  min-width: 0;
+  max-width: 100%;
+  overflow-x: hidden;
+}
+
+body.staff-body .staff-main .card {
+  max-width: 100%;
+}
+
+body.staff-body .staff-main .page-head h1 {
+  font-size: 26px;
+}
+
+body.staff-body .staff-main table {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: auto;
+}
+
+body.staff-body .staff-main th {
+  text-align: left;
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--ink-soft);
+  background: var(--cream-2);
+  padding: 10px 12px;
+  white-space: nowrap;
+}
+
+body.staff-body .staff-main td {
+  padding: 12px;
+  font-size: 13px;
+  border-top: 1px solid var(--line);
+  vertical-align: top;
+}
+
+body.staff-body .stat-row {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 14px;
+  margin: 20px 0 28px;
+}
+
+body.staff-body .stat-row .card {
+  margin-bottom: 0;
+}
+
+body.staff-body .actions-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  align-items: flex-start;
+  max-width: 280px;
+}
+
+body.staff-body .actions-stack form {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  width: auto;
+  max-width: 100%;
+}
+
+body.staff-body .checks {
+  display: inline-flex;
+  gap: 6px;
+  align-items: center;
+  font-size: 12px;
+  margin: 0;
+  white-space: nowrap;
+}
+
+body.staff-body .checks input[type="checkbox"] {
+  width: 14px;
+  height: 14px;
+  flex: none;
+}
+
+body.staff-body .staff-main .btn {
+  min-height: 34px;
+  padding: 7px 12px;
+  font-size: 12.5px;
+  width: auto;
+  box-shadow: var(--shadow-sm);
+}
+
+body.staff-body .filters .field input,
+body.staff-body .filters .field select,
+body.staff-body .form-grid input,
+body.staff-body .form-grid select {
+  width: 100%;
+}
+
+body.staff-body .actions-stack input[type="text"],
+body.staff-body .actions-stack input[type="email"],
+body.staff-body .actions-stack input:not([type="checkbox"]):not([type="hidden"]):not([type="radio"]) {
+  width: 160px;
+  min-width: 120px;
+  padding: 8px 10px;
+  font-size: 12.5px;
+}
+
+body.staff-body .mobile-tabs {
+  display: none;
+}
+
+@media (max-width: 900px) {
+  body.staff-body .shell {
+    grid-template-columns: 1fr;
+  }
+
+  body.staff-body .sidebar {
+    display: none;
+  }
+
+  body.staff-body .mobile-tabs {
+    display: flex;
+  }
+
+  body.staff-body .stat-row {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  body.staff-body .staff-main {
+    padding: 20px 16px 60px;
+  }
+
+  body.staff-body .staff-header .nav-row {
+    flex-wrap: wrap;
+  }
+}

@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% block title %}NPIMS — Payment{% endblock %}
+{% block extra_css %}
+<style>
+  .pay-wrap { max-width: 520px; margin: 36px auto 60px; padding: 0 24px; }
+  .pay-wrap .eyebrow { border: none; padding: 0; color: var(--clay); margin-bottom: 8px; }
+  .amount { font-family: 'Fraunces', serif; font-size: 36px; color: var(--forest); margin: 16px 0; }
+  .pay-wrap h1 { font-size: 28px; }
+</style>
+{% endblock %}
+{% block content %}
+<div class="pay-wrap">
+  <div class="card">
+    <div class="eyebrow">Record payment</div>
+    <h1>Confirm fee</h1>
+    <div class="amount">GH₵ {{ '%.2f'|format(amount) }}</div>
+    <p class="muted" style="margin-bottom:22px;">
+      {% if kind == 'passport' %}Passport application <strong>{{ ref }}</strong>
+      {% else %}Visa application <strong>#{{ ref }}</strong>{% endif %}
+    </p>
+    <form method="post" action="{{ url_for('payment') }}">
+      <input type="hidden" name="kind" value="{{ kind }}">
+      <input type="hidden" name="ref" value="{{ ref }}">
+      <div class="field">
+        <label for="payment_method">Payment method</label>
+        <select id="payment_method" name="payment_method" required>
+          <option value="mobile money">Mobile money</option>
+          <option value="card">Card</option>
+          <option value="cash">Cash</option>
+        </select>
+      </div>
+      <button class="btn btn-clay btn-block caps" type="submit">Record payment</button>
+    </form>
+    <p style="text-align:center;margin-top:16px;">
+      <a class="btn btn-ghost btn-sm" href="{{ url_for('citizen') }}">Back to dashboard</a>
+    </p>
+    <p class="muted" style="margin-top:14px;">Passport payments move the application to processing so officers can continue review.</p>
+  </div>
+</div>
+{% endblock %}

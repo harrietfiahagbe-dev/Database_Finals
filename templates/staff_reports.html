@@ -1,0 +1,127 @@
+{% extends "staff_base.html" %}
+{% block title %}Reports{% endblock %}
+{% block content %}
+<div class="page-head">
+  <h1>Reports</h1>
+  <p class="muted">Role-gated views and queries from the NPIMS schema.</p>
+</div>
+
+{% if role_rank >= 1 %}
+<div class="card">
+  <h2>Passports expiring within 90 days</h2>
+  <div class="table-scroll">
+  <table>
+    <thead><tr><th>Passport</th><th>Citizen</th><th>Type</th><th>Expiry</th><th>Days left</th></tr></thead>
+    <tbody>
+    {% for r in reports.expiring or [] %}
+    <tr>
+      <td>{{ r.passport_id }}</td>
+      <td>{{ r.nat_idcard }}</td>
+      <td>{{ r.passport_type }}</td>
+      <td>{{ r.expiry_date }}</td>
+      <td>{{ r.days_left }}</td>
+    </tr>
+    {% else %}
+    <tr><td colspan="5">None in the next 90 days.</td></tr>
+    {% endfor %}
+    </tbody>
+  </table>
+  </div>
+</div>
+{% endif %}
+
+{% if role_rank >= 3 %}
+<div class="card">
+  <h2>Officer performance</h2>
+  <div class="table-scroll">
+  <table>
+    {% if reports.officer_perf %}
+    <thead><tr>{% for k in reports.officer_perf[0].keys() %}<th>{{ k }}</th>{% endfor %}</tr></thead>
+    <tbody>{% for row in reports.officer_perf %}<tr>{% for v in row.values() %}<td>{{ v }}</td>{% endfor %}</tr>{% endfor %}</tbody>
+    {% else %}<tbody><tr><td>No data</td></tr></tbody>{% endif %}
+  </table>
+  </div>
+</div>
+<div class="card">
+  <h2>Border traffic</h2>
+  <div class="table-scroll">
+  <table>
+    {% if reports.border_traffic %}
+    <thead><tr>{% for k in reports.border_traffic[0].keys() %}<th>{{ k }}</th>{% endfor %}</tr></thead>
+    <tbody>{% for row in reports.border_traffic %}<tr>{% for v in row.values() %}<td>{{ v }}</td>{% endfor %}</tr>{% endfor %}</tbody>
+    {% else %}<tbody><tr><td>No data</td></tr></tbody>{% endif %}
+  </table>
+  </div>
+</div>
+<div class="card">
+  <h2>Citizen summary (view)</h2>
+  <div class="table-scroll">
+  <table>
+    {% if reports.citizen_summary %}
+    <thead><tr>{% for k in reports.citizen_summary[0].keys() %}<th>{{ k }}</th>{% endfor %}</tr></thead>
+    <tbody>{% for row in reports.citizen_summary %}<tr>{% for v in row.values() %}<td>{{ v }}</td>{% endfor %}</tr>{% endfor %}</tbody>
+    {% else %}<tbody><tr><td>No data</td></tr></tbody>{% endif %}
+  </table>
+  </div>
+</div>
+<div class="card">
+  <h2>Citizens by applications</h2>
+  <div class="table-scroll">
+  <table>
+    <thead><tr><th>National ID</th><th>Name</th><th>Passports</th><th>Visas</th><th>Total apps</th></tr></thead>
+    <tbody>
+    {% for r in reports.citizens_by_apps or [] %}
+    <tr>
+      <td>{{ r.nat_idcard }}</td>
+      <td>{{ r.fname }} {{ r.lname }}</td>
+      <td>{{ r.passport_count }}</td>
+      <td>{{ r.visa_count }}</td>
+      <td>{{ r.total_apps }}</td>
+    </tr>
+    {% else %}
+    <tr><td colspan="5">No data</td></tr>
+    {% endfor %}
+    </tbody>
+  </table>
+  </div>
+</div>
+{% endif %}
+
+{% if role_rank >= 4 %}
+<div class="card">
+  <h2>Payment overview</h2>
+  <div class="table-scroll">
+  <table>
+    {% if reports.payments %}
+    <thead><tr>{% for k in reports.payments[0].keys() %}<th>{{ k }}</th>{% endfor %}</tr></thead>
+    <tbody>{% for row in reports.payments %}<tr>{% for v in row.values() %}<td>{{ v }}</td>{% endfor %}</tr>{% endfor %}</tbody>
+    {% else %}<tbody><tr><td>No data</td></tr></tbody>{% endif %}
+  </table>
+  </div>
+</div>
+<div class="card">
+  <h2>Monthly revenue (completed)</h2>
+  <div class="table-scroll">
+  <table>
+    <thead><tr><th>Year</th><th>Month</th><th>Total</th><th>Count</th></tr></thead>
+    <tbody>
+    {% for r in reports.monthly_revenue or [] %}
+    <tr>
+      <td>{{ r.yr }}</td>
+      <td>{{ r.mo }}</td>
+      <td>GH₵ {{ '%.2f'|format(r.total) }}</td>
+      <td>{{ r.n }}</td>
+    </tr>
+    {% else %}
+    <tr><td colspan="4">No data</td></tr>
+    {% endfor %}
+    </tbody>
+  </table>
+  </div>
+</div>
+{% endif %}
+
+{% if role_rank < 1 %}
+<p class="muted">No reports for this role.</p>
+{% endif %}
+{% endblock %}

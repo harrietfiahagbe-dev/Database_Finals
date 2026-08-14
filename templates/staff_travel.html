@@ -1,0 +1,77 @@
+{% extends "staff_base.html" %}
+{% block title %}Travel{% endblock %}
+{% block content %}
+<div class="page-head">
+  <h1>Travel records</h1>
+  <p class="muted">Log entry or exit at a border post, then filter the history below.</p>
+</div>
+<div class="card">
+  <h2 style="font-size:18px;">Log entry / exit</h2>
+  <form method="post" action="{{ url_for('staff_travel_log') }}" class="form-grid" style="margin-top:12px;">
+    <div class="field"><label for="nat_idcard">National ID</label><input id="nat_idcard" name="nat_idcard" required pattern="[0-9]{9}"></div>
+    <div class="field"><label for="passport_id">Passport ID</label><input id="passport_id" name="passport_id" required></div>
+    <div class="field"><label for="post_id">Border post</label>
+      <select id="post_id" name="post_id" required>
+        {% for post in posts %}
+        <option value="{{ post.post_id }}">{{ post.border_name }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="field"><label for="entry_exit">Entry / exit</label>
+      <select id="entry_exit" name="entry_exit" required>
+        <option value="entry">Entry</option>
+        <option value="exit">Exit</option>
+      </select>
+    </div>
+    <div class="field full"><label for="destination_country">Destination country</label><input id="destination_country" name="destination_country" required value="Ghana"></div>
+    <div class="full"><button class="btn btn-primary" type="submit">Log travel record</button></div>
+  </form>
+</div>
+<div class="card">
+  <form class="filters" method="get">
+    <div class="field"><label>National ID</label><input name="nat_idcard" value="{{ nat_idcard or '' }}"></div>
+    <div class="field"><label>Passport ID</label><input name="passport_id" value="{{ passport_id or '' }}"></div>
+    <div class="field"><label>Type</label>
+      <select name="entry_exit">
+        <option value="">Any</option>
+        <option value="entry" {% if entry_exit=='entry' %}selected{% endif %}>Entry</option>
+        <option value="exit" {% if entry_exit=='exit' %}selected{% endif %}>Exit</option>
+      </select>
+    </div>
+    <div class="field"><label>From</label><input type="date" name="date_from" value="{{ date_from or '' }}"></div>
+    <div class="field"><label>To</label><input type="date" name="date_to" value="{{ date_to or '' }}"></div>
+    <div class="field"><label>Post</label>
+      <select name="post_id">
+        <option value="">Any</option>
+        {% for post in posts %}
+        <option value="{{ post.post_id }}" {% if post_id==post.post_id|string %}selected{% endif %}>{{ post.border_name }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="field"><label>&nbsp;</label><button class="btn btn-primary" type="submit">Filter</button></div>
+  </form>
+  <div class="filter-meta">
+    <span class="muted">{{ rows|length }} result{{ 's' if rows|length != 1 else '' }}</span>
+    <a href="{{ url_for('staff_travel_page') }}">Clear filters</a>
+  </div>
+  <div class="table-scroll">
+  <table>
+    <thead><tr><th>When</th><th>Citizen</th><th>Passport</th><th>Post</th><th>Type</th><th>Destination</th></tr></thead>
+    <tbody>
+    {% for t in rows %}
+    <tr>
+      <td>{{ t.timestamp }}</td>
+      <td>{{ t.nat_idcard }}</td>
+      <td>{{ t.passport_id }}</td>
+      <td>{{ t.border_name }}</td>
+      <td>{{ t.entry_exit }}</td>
+      <td>{{ t.destination_country }}</td>
+    </tr>
+    {% else %}
+    <tr><td colspan="6">No travel records.</td></tr>
+    {% endfor %}
+    </tbody>
+  </table>
+  </div>
+</div>
+{% endblock %}

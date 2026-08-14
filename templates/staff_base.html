@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NPIMS — {% block title %}Staff{% endblock %}</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600&family=Work+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='npims.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='staff.css') }}">
+  {% block extra_css %}{% endblock %}
+</head>
+<body class="staff-body">
+  <div class="kente-strip" aria-hidden="true"></div>
+  <header class="site-header staff-header">
+    <div class="nav-row">
+      <div class="brand-plain">NPIMS Staff</div>
+      <div class="staff-who">
+        <span><strong>{{ user.name }}</strong> · {{ user.position }} · {{ user.role }}</span>
+        <a class="btn btn-ghost btn-sm" href="{{ url_for('logout') }}">Log out</a>
+      </div>
+    </div>
+  </header>
+  {% set nav = active_nav|default('queue') %}
+  <nav class="mobile-tabs" aria-label="Staff sections">
+    <a href="{{ url_for('staff') }}" class="{{ 'active' if nav=='queue' else '' }}">Queue</a>
+    <a href="{{ url_for('staff_citizens') }}" class="{{ 'active' if nav=='citizens' else '' }}">Citizens</a>
+    <a href="{{ url_for('staff_passports') }}" class="{{ 'active' if nav=='passports' else '' }}">Passports</a>
+    <a href="{{ url_for('staff_visas') }}" class="{{ 'active' if nav=='visas' else '' }}">Visas</a>
+    <a href="{{ url_for('staff_travel_page') }}" class="{{ 'active' if nav=='travel' else '' }}">Travel</a>
+    <a href="{{ url_for('staff_payments') }}" class="{{ 'active' if nav=='payments' else '' }}">Payments</a>
+    <a href="{{ url_for('staff_posts') }}" class="{{ 'active' if nav=='posts' else '' }}">Posts</a>
+    <a href="{{ url_for('staff_officers') }}" class="{{ 'active' if nav=='officers' else '' }}">Officers</a>
+    <a href="{{ url_for('staff_reports') }}" class="{{ 'active' if nav=='reports' else '' }}">Reports</a>
+  </nav>
+  <div class="shell">
+    <aside class="sidebar">
+      <nav class="snav" aria-label="Staff">
+        <a href="{{ url_for('staff') }}" class="{{ 'active' if nav=='queue' else '' }}">Queue</a>
+        <div class="grp">Records</div>
+        <a href="{{ url_for('staff_citizens') }}" class="{{ 'active' if nav=='citizens' else '' }}">Citizens</a>
+        <a href="{{ url_for('staff_passports') }}" class="{{ 'active' if nav=='passports' else '' }}">Passports</a>
+        <a href="{{ url_for('staff_visas') }}" class="{{ 'active' if nav=='visas' else '' }}">Visas</a>
+        <a href="{{ url_for('staff_travel_page') }}" class="{{ 'active' if nav=='travel' else '' }}">Travel</a>
+        <a href="{{ url_for('staff_payments') }}" class="{{ 'active' if nav=='payments' else '' }}">Payments</a>
+        <div class="grp">Admin</div>
+        <a href="{{ url_for('staff_posts') }}" class="{{ 'active' if nav=='posts' else '' }}">Border posts</a>
+        <a href="{{ url_for('staff_officers') }}" class="{{ 'active' if nav=='officers' else '' }}">Officers</a>
+        <a href="{{ url_for('staff_reports') }}" class="{{ 'active' if nav=='reports' else '' }}">Reports</a>
+      </nav>
+    </aside>
+    <main class="staff-main">
+      {% with messages = get_flashed_messages(with_categories=true) %}
+      {% for category, message in messages %}
+      <div class="flash flash-{{ category }}" role="status">{{ message }}</div>
+      {% endfor %}
+      {% endwith %}
+      {% block content %}{% endblock %}
+    </main>
+  </div>
+</body>
+</html>

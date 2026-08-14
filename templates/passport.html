@@ -1,0 +1,449 @@
+{% extends "base.html" %}
+{% block title %}NPIMS — Apply for a passport{% endblock %}
+{% block extra_css %}
+<style>
+  .app-layout {
+    display: grid;
+    grid-template-columns: 1fr 340px;
+    gap: 32px;
+    align-items: start;
+  }
+
+  @media (max-width: 900px) {
+    .app-layout {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .page-head {
+    margin-bottom: 30px;
+  }
+
+  .page-head .eyebrow {
+    font-size: 11.5px;
+    color: var(--clay);
+    margin-bottom: 8px;
+    display: block;
+  }
+
+  .page-head h1 {
+    font-size: 30px;
+    margin-bottom: 0;
+  }
+
+  .page-head p {
+    font-size: 13.5px;
+    margin-top: 8px;
+    margin-bottom: 0;
+    max-width: 520px;
+  }
+
+  .breadcrumb {
+    font-size: 12px;
+    color: var(--ink-soft);
+    margin-bottom: 18px;
+  }
+
+  .breadcrumb a {
+    color: var(--clay);
+  }
+
+  .status-note {
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+    background: var(--cream-2);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 14px 16px;
+    margin-bottom: 26px;
+  }
+
+  .status-note.warn {
+    background: #F5E6E1;
+  }
+
+  .status-note svg {
+    width: 18px;
+    height: 18px;
+    color: var(--clay);
+    flex: none;
+    margin-top: 2px;
+  }
+
+  .status-note .t {
+    font-size: 12.5px;
+    font-weight: 500;
+    color: var(--forest);
+    margin-bottom: 2px;
+  }
+
+  .status-note .d {
+    font-size: 12px;
+    color: var(--ink-soft);
+  }
+
+  .field label .req {
+    color: var(--clay);
+  }
+
+  .app-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+  }
+
+  @media (max-width: 520px) {
+    .app-row {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .type-options {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+  }
+
+  @media (max-width: 520px) {
+    .type-options {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .type-option {
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 14px;
+    cursor: pointer;
+    transition: border-color .15s ease, background .15s ease;
+    display: block;
+  }
+
+  .type-option:hover {
+    border-color: var(--forest);
+  }
+
+  .type-option.selected {
+    border-color: var(--forest);
+    background: var(--cream-2);
+  }
+
+  .type-option input {
+    display: none;
+  }
+
+  .type-option .name {
+    font-size: 13.5px;
+    font-weight: 500;
+    color: var(--forest);
+  }
+
+  .type-option .desc {
+    font-size: 11px;
+    color: var(--ink-soft);
+    margin-top: 3px;
+  }
+
+  .type-option .price {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--clay);
+    margin-top: 8px;
+  }
+
+  .fee-due {
+    margin-top: 14px;
+    padding: 12px 14px;
+    border-radius: 10px;
+    background: var(--cream-2);
+    border: 1px solid var(--line);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 13px;
+  }
+
+  .fee-due strong {
+    font-family: 'Fraunces', serif;
+    font-size: 18px;
+    color: var(--forest);
+  }
+
+  .fee-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 12.5px;
+  }
+
+  .fee-table td {
+    padding: 8px 0;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .fee-table tr:last-child td {
+    border-bottom: none;
+  }
+
+  .fee-table td:last-child {
+    text-align: right;
+    font-weight: 500;
+    color: var(--forest);
+  }
+
+  .fee-table tr.active td {
+    background: #E8F0EA;
+    color: var(--forest);
+    font-weight: 500;
+  }
+
+  .disabled-field {
+    opacity: .55;
+  }
+
+  .locked-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 10.5px;
+    color: var(--ink-soft);
+    background: var(--cream-2);
+    padding: 3px 9px;
+    border-radius: 100px;
+    margin-left: 8px;
+    text-transform: none;
+    letter-spacing: 0;
+    font-weight: 400;
+  }
+
+  .form-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    margin-top: 8px;
+    padding-top: 22px;
+    border-top: 1px solid var(--line);
+    flex-wrap: wrap;
+  }
+
+  .form-footer-actions {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 6px;
+  }
+
+  .side-card {
+    margin-bottom: 20px;
+  }
+
+  .side-card h3 {
+    font-size: 15px;
+    margin-bottom: 12px;
+  }
+
+  .side-card p {
+    font-size: 12.5px;
+    color: var(--ink-soft);
+    margin-bottom: 10px;
+  }
+
+  .rule-list {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .rule-list li {
+    display: flex;
+    gap: 10px;
+    font-size: 12.5px;
+    color: var(--ink-soft);
+    align-items: flex-start;
+  }
+
+  .rule-list svg {
+    width: 16px;
+    height: 16px;
+    color: var(--forest);
+    flex: none;
+    margin-top: 2px;
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<main class="page-main">
+  <div class="wrap">
+    <div class="breadcrumb"><a href="{{ url_for('citizen') }}">Dashboard</a> &nbsp;/&nbsp; Apply for a passport</div>
+
+    <div class="page-head">
+      <span class="eyebrow caps">New application</span>
+      <h1>Apply for a passport</h1>
+      <p>Fill in the details below. Your application enters the queue as pending until an officer verifies it and you
+        complete payment.</p>
+    </div>
+
+    <div class="app-layout">
+      <div class="card">
+        <div class="status-note">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6">
+            <circle cx="12" cy="12" r="9" />
+            <line x1="12" y1="8" x2="12" y2="13" />
+            <line x1="12" y1="16" x2="12.01" y2="16" />
+          </svg>
+          <div>
+            <div class="t">You're applying as {{ user.name }} — national ID {{ user.citizen_id }}</div>
+            <div class="d">Status starts at "pending" and only an officer can move it forward.</div>
+          </div>
+        </div>
+
+        <form action="{{ url_for('passport') }}" method="post">
+          {% if blocked %}
+          <div class="status-note warn" style="margin-bottom:18px;">
+            <div>
+              <div class="t">Application already in progress</div>
+              <div class="d">Passport {{ blocked.passport_id }} is {{ blocked.status }}. You can only have one pending/processing passport at a time.</div>
+            </div>
+          </div>
+          {% endif %}
+
+          <div class="field">
+            <label>Passport type <span class="req">*</span></label>
+            <div class="type-options" id="passportTypeOptions">
+              <label class="type-option selected">
+                <input type="radio" name="passport_type" value="ordinary" data-fee="150" checked>
+                <div class="name">Ordinary</div>
+                <div class="desc">Standard travel passport</div>
+                <div class="price">GH₵ 150</div>
+              </label>
+              <label class="type-option">
+                <input type="radio" name="passport_type" value="official" data-fee="250">
+                <div class="name">Official</div>
+                <div class="desc">Government business travel</div>
+                <div class="price">GH₵ 250</div>
+              </label>
+              <label class="type-option">
+                <input type="radio" name="passport_type" value="diplomatic" data-fee="300">
+                <div class="name">Diplomatic</div>
+                <div class="desc">Diplomatic corps only</div>
+                <div class="price">GH₵ 300</div>
+              </label>
+            </div>
+            <div class="fee-due">
+              <span>Fee for selected type</span>
+              <strong id="passportFeeLabel">GH₵ 150.00</strong>
+            </div>
+          </div>
+
+          <div class="app-row">
+            <div class="field">
+              <label>Requested issue date (demo) <span class="req">*</span></label>
+              <input type="date" name="issue_date" required>
+              <div class="hint">Date the passport takes effect.</div>
+            </div>
+            <div class="field">
+              <label>Requested expiry date (demo) <span class="req">*</span></label>
+              <input type="date" name="expiry_date" required>
+              <div class="hint">Must be later than the issue date.</div>
+            </div>
+          </div>
+
+          <div class="field disabled-field">
+            <label>Status <span class="locked-pill">Set automatically</span></label>
+            <input type="text" value="Pending" disabled>
+            <div class="hint">Every application starts here. It moves to processing once payment is completed.</div>
+          </div>
+
+          <div class="form-footer">
+            <a class="btn btn-ghost caps" href="{{ url_for('citizen') }}">Cancel</a>
+            <div class="form-footer-actions">
+              <button class="btn btn-primary caps" type="submit" {% if blocked %}disabled{% endif %}>Continue to payment</button>
+              {% if blocked %}
+              <p class="muted" style="margin:0;text-align:right;">Blocked — you already have a passport in progress.</p>
+              {% endif %}
+            </div>
+          </div>
+        </form>
+      </div>
+
+      <aside>
+        <div class="card side-card">
+          <h3>Before you submit</h3>
+          <ul class="rule-list">
+            <li>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6">
+                <path d="M20 6 9 17l-5-5" />
+              </svg>
+              <span>You can only have one passport in progress at a time.</span>
+            </li>
+            <li>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6">
+                <path d="M20 6 9 17l-5-5" />
+              </svg>
+              <span>The expiry date must fall after the issue date.</span>
+            </li>
+            <li>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6">
+                <path d="M20 6 9 17l-5-5" />
+              </svg>
+              <span>Payment is required before an officer will begin processing.</span>
+            </li>
+          </ul>
+        </div>
+
+        <div class="card side-card">
+          <h3>Passport fees</h3>
+          <table class="fee-table" id="passportFeeTable">
+            <tr data-type="ordinary" class="active">
+              <td>Ordinary</td>
+              <td>GH₵ 150.00</td>
+            </tr>
+            <tr data-type="official">
+              <td>Official</td>
+              <td>GH₵ 250.00</td>
+            </tr>
+            <tr data-type="diplomatic">
+              <td>Diplomatic</td>
+              <td>GH₵ 300.00</td>
+            </tr>
+          </table>
+        </div>
+      </aside>
+    </div>
+  </div>
+</main>
+{% endblock %}
+
+{% block scripts %}
+<script>
+  function syncPassportType() {
+    const checked = document.querySelector('input[name="passport_type"]:checked');
+    if (!checked) return;
+    document.querySelectorAll('.type-option').forEach(o => {
+      o.classList.toggle('selected', o.contains(checked));
+    });
+    const fee = Number(checked.dataset.fee || 0);
+    const label = document.getElementById('passportFeeLabel');
+    if (label) label.textContent = 'GH₵ ' + fee.toFixed(2);
+    document.querySelectorAll('#passportFeeTable tr[data-type]').forEach(row => {
+      row.classList.toggle('active', row.dataset.type === checked.value);
+    });
+  }
+
+  document.querySelectorAll('input[name="passport_type"]').forEach(input => {
+    input.addEventListener('change', syncPassportType);
+  });
+  document.querySelectorAll('.type-option').forEach(opt => {
+    opt.addEventListener('click', function (e) {
+      const input = opt.querySelector('input');
+      if (!input || input.disabled) return;
+      input.checked = true;
+      syncPassportType();
+    });
+  });
+  syncPassportType();
+</script>
+{% endblock %}

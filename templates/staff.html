@@ -1,0 +1,107 @@
+{% extends "staff_base.html" %}
+{% block title %}Queue{% endblock %}
+{% block content %}
+<div class="page-head">
+  <h1>Staff queue</h1>
+  <p class="muted">Pending passports and visas. Verify documents (senior+), then approve (supervisor+).</p>
+</div>
+<div class="stat-row">
+  <div class="card"><div class="stat-label">Pending passports</div><div class="stat-num">{{ stats.pending_passports }}</div></div>
+  <div class="card"><div class="stat-label">Pending visas</div><div class="stat-num">{{ stats.pending_visas }}</div></div>
+  <div class="card"><div class="stat-label">Travel today</div><div class="stat-num">{{ stats.today_travel }}</div></div>
+  <div class="card"><div class="stat-label">Border posts</div><div class="stat-num">{{ stats.posts }}</div></div>
+</div>
+
+<div class="card">
+  <div class="block-head"><h2>Passport queue</h2><a class="btn btn-ghost btn-sm" href="{{ url_for('staff_passports') }}">All passports</a></div>
+  <div class="table-scroll">
+  <table>
+    <thead><tr><th>ID</th><th>Citizen</th><th>Type</th><th>Status</th><th>Actions</th></tr></thead>
+    <tbody>
+    {% for p in pending_passports %}
+    <tr>
+      <td>{{ p.passport_id }}</td>
+      <td>{{ p.fname }} {{ p.lname }} ({{ p.nat_idcard }})</td>
+      <td>{{ p.passport_type }}</td>
+      <td><span class="badge badge-{{ p.status }}">{{ p.status }}</span></td>
+      <td>
+        <div class="actions-stack">
+        {% if role_rank >= 2 and p.status == 'pending' %}
+        <form method="post" action="{{ url_for('staff_passport_status', passport_id=p.passport_id) }}">
+          <input type="hidden" name="status" value="processing">
+          <input type="hidden" name="next" value="queue">
+          <button class="btn btn-sm" type="submit">Verify docs</button>
+        </form>
+        {% endif %}
+        {% if role_rank >= 2 and p.status in ['pending','processing'] %}
+        <form method="post" action="{{ url_for('staff_passport_status', passport_id=p.passport_id) }}" onsubmit="return confirm('Reject this passport application?');">
+          <input type="hidden" name="status" value="rejected">
+          <input type="hidden" name="next" value="queue">
+          <button class="btn btn-warn btn-sm" type="submit">Reject</button>
+        </form>
+        {% endif %}
+        {% if role_rank >= 3 and p.status in ['pending','processing'] %}
+        <form method="post" action="{{ url_for('staff_passport_approve', passport_id=p.passport_id) }}">
+          <input type="hidden" name="next" value="queue">
+          <label class="checks"><input type="checkbox" name="fee_paid"> Fee paid</label>
+          <label class="checks"><input type="checkbox" name="biometric_captured"> Biometric</label>
+          <button class="btn btn-primary btn-sm" type="submit">Approve</button>
+        </form>
+        {% endif %}
+        {% if role_rank < 2 %}
+        <span class="muted">View only</span>
+        {% elif p.status not in ['pending','processing'] %}
+        <span class="muted">No actions</span>
+        {% endif %}
+        </div>
+      </td>
+    </tr>
+    {% else %}
+    <tr><td colspan="5">No pending passports.</td></tr>
+    {% endfor %}
+    </tbody>
+  </table>
+  </div>
+</div>
+
+<div class="card">
+  <div class="block-head"><h2>Visa queue</h2><a class="btn btn-ghost btn-sm" href="{{ url_for('staff_visas') }}">All visas</a></div>
+  <div class="table-scroll">
+  <table>
+    <thead><tr><th>ID</th><th>Citizen</th><th>Type</th><th>Destination</th><th>Actions</th></tr></thead>
+    <tbody>
+    {% for v in pending_visas %}
+    <tr>
+      <td>{{ v.visa_id }}</td>
+      <td>{{ v.fname }} {{ v.lname }}</td>
+      <td>{{ v.visa_type }}</td>
+      <td>{{ v.destination }}</td>
+      <td>
+        <div class="actions-stack">
+        {% if v.status == 'pending' and role_rank >= 3 %}
+        <form method="post" action="{{ url_for('staff_visa_status', visa_id=v.visa_id) }}">
+          <input type="hidden" name="status" value="approved">
+          <input type="hidden" name="next" value="queue">
+          <button class="btn btn-primary btn-sm" type="submit">Approve</button>
+        </form>
+        <form method="post" action="{{ url_for('staff_visa_status', visa_id=v.visa_id) }}" onsubmit="return confirm('Reject this visa application?');">
+          <input type="hidden" name="status" value="rejected">
+          <input type="hidden" name="next" value="queue">
+          <button class="btn btn-warn btn-sm" type="submit">Reject</button>
+        </form>
+        {% elif v.status == 'pending' %}
+        <span class="muted">{% if role_rank >= 2 %}Awaiting supervisor{% else %}View only{% endif %}</span>
+        {% else %}
+        <span class="muted">Finalized</span>
+        {% endif %}
+        </div>
+      </td>
+    </tr>
+    {% else %}
+    <tr><td colspan="5">No pending visas.</td></tr>
+    {% endfor %}
+    </tbody>
+  </table>
+  </div>
+</div>
+{% endblock %}

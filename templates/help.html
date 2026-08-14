@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% block title %}NPIMS — Help{% endblock %}
+{% block content %}
+<main class="page-main">
+  <div class="wrap-narrow">
+    <div class="page-head">
+      <h1>Help</h1>
+      <p>Quick answers for citizens and staff using NPIMS.</p>
+    </div>
+    <div class="q-card">
+      <h2>How do I apply for a passport?</h2>
+      <p>Sign up or log in with your 9-digit Ghana Card number, open Apply for passport, submit the form, then record payment.</p>
+    </div>
+    <div class="q-card">
+      <h2>Why was my second passport application blocked?</h2>
+      <p>You may only have one passport in pending or processing at a time.</p>
+    </div>
+    <div class="q-card">
+      <h2>How do I track my application?</h2>
+      <p>Use Track from the main menu. Search by passport or visa ID, or leave the box empty to list all of your records.</p>
+    </div>
+    <div class="q-card">
+      <h2>Need more detail on fees?</h2>
+      <p>See the <a href="{{ url_for('eligibility') }}" style="color:var(--clay);font-weight:500;">Eligibility &amp; fees</a> page.</p>
+    </div>
+  </div>
+</main>
+{% endblock %}

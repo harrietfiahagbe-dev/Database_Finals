@@ -1,0 +1,511 @@
+{% extends "base.html" %}
+{% block title %}NPIMS — Apply for a visa{% endblock %}
+{% block extra_css %}
+<style>
+  .app-layout {
+    display: grid;
+    grid-template-columns: 1fr 340px;
+    gap: 32px;
+    align-items: start;
+  }
+
+  @media (max-width: 900px) {
+    .app-layout {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .page-head {
+    margin-bottom: 30px;
+  }
+
+  .page-head .eyebrow {
+    font-size: 11.5px;
+    color: var(--clay);
+    margin-bottom: 8px;
+    display: block;
+  }
+
+  .page-head h1 {
+    font-size: 30px;
+    margin-bottom: 0;
+  }
+
+  .page-head p {
+    font-size: 13.5px;
+    margin-top: 8px;
+    margin-bottom: 0;
+    max-width: 520px;
+  }
+
+  .breadcrumb {
+    font-size: 12px;
+    color: var(--ink-soft);
+    margin-bottom: 18px;
+  }
+
+  .breadcrumb a {
+    color: var(--clay);
+  }
+
+  .status-note {
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+    background: var(--cream-2);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 14px 16px;
+    margin-bottom: 26px;
+  }
+
+  .status-note svg {
+    width: 18px;
+    height: 18px;
+    color: var(--clay);
+    flex: none;
+    margin-top: 2px;
+  }
+
+  .status-note .t {
+    font-size: 12.5px;
+    font-weight: 500;
+    color: var(--forest);
+    margin-bottom: 2px;
+  }
+
+  .status-note .d {
+    font-size: 12px;
+    color: var(--ink-soft);
+  }
+
+  .field label .req {
+    color: var(--clay);
+  }
+
+  .app-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+  }
+
+  @media (max-width: 520px) {
+    .app-row {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .passport-option {
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 14px 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    cursor: pointer;
+    margin-bottom: 10px;
+    transition: border-color .15s ease, background .15s ease;
+  }
+
+  .passport-option.selected {
+    border-color: var(--forest);
+    background: var(--cream-2);
+  }
+
+  .passport-option .left .id {
+    font-weight: 500;
+    color: var(--forest);
+    font-size: 13.5px;
+  }
+
+  .passport-option .left .exp {
+    font-size: 11.5px;
+    color: var(--ink-soft);
+    margin-top: 2px;
+  }
+
+  .eligible-tag {
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: .05em;
+    color: var(--ok);
+    background: #E8F0EA;
+    padding: 3px 9px;
+    border-radius: 100px;
+  }
+
+  .passport-option input {
+    display: none;
+  }
+
+  .type-options {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+  }
+
+  @media (max-width: 520px) {
+    .type-options {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .type-option {
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 14px;
+    cursor: pointer;
+    transition: border-color .15s ease, background .15s ease;
+    display: block;
+  }
+
+  .type-option:hover {
+    border-color: var(--forest);
+  }
+
+  .type-option.selected {
+    border-color: var(--forest);
+    background: var(--cream-2);
+  }
+
+  .type-option input {
+    display: none;
+  }
+
+  .type-option .name {
+    font-size: 13.5px;
+    font-weight: 500;
+    color: var(--forest);
+  }
+
+  .type-option .desc {
+    font-size: 11px;
+    color: var(--ink-soft);
+    margin-top: 3px;
+  }
+
+  .type-option .price {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--clay);
+    margin-top: 8px;
+  }
+
+  .fee-due {
+    margin-top: 14px;
+    padding: 12px 14px;
+    border-radius: 10px;
+    background: var(--cream-2);
+    border: 1px solid var(--line);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 13px;
+  }
+
+  .fee-due strong {
+    font-family: 'Fraunces', serif;
+    font-size: 18px;
+    color: var(--forest);
+  }
+
+  .fee-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 12.5px;
+  }
+
+  .fee-table td {
+    padding: 8px 0;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .fee-table tr:last-child td {
+    border-bottom: none;
+  }
+
+  .fee-table td:last-child {
+    text-align: right;
+    font-weight: 500;
+    color: var(--forest);
+  }
+
+  .fee-table tr.active td {
+    background: #E8F0EA;
+    color: var(--forest);
+    font-weight: 500;
+  }
+
+  .disabled-field {
+    opacity: .55;
+  }
+
+  .locked-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 10.5px;
+    color: var(--ink-soft);
+    background: var(--cream-2);
+    padding: 3px 9px;
+    border-radius: 100px;
+    margin-left: 8px;
+    text-transform: none;
+    letter-spacing: 0;
+    font-weight: 400;
+  }
+
+  .form-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    margin-top: 8px;
+    padding-top: 22px;
+    border-top: 1px solid var(--line);
+    flex-wrap: wrap;
+  }
+
+  .form-footer-actions {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 6px;
+  }
+
+  .side-card {
+    margin-bottom: 20px;
+  }
+
+  .side-card h3 {
+    font-size: 15px;
+    margin-bottom: 12px;
+  }
+
+  .rule-list {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .rule-list li {
+    display: flex;
+    gap: 10px;
+    font-size: 12.5px;
+    color: var(--ink-soft);
+    align-items: flex-start;
+  }
+
+  .rule-list svg {
+    width: 16px;
+    height: 16px;
+    color: var(--forest);
+    flex: none;
+    margin-top: 2px;
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<main class="page-main">
+  <div class="wrap">
+    <div class="breadcrumb"><a href="{{ url_for('citizen') }}">Dashboard</a> &nbsp;/&nbsp; Apply for a visa</div>
+
+    <div class="page-head">
+      <span class="eyebrow caps">New application</span>
+      <h1>Apply for a visa</h1>
+      <p>Choose the passport you're travelling on, then tell us where you're headed. Your passport must stay valid for
+        at least six months past the visa's issue date.</p>
+    </div>
+
+    <div class="app-layout">
+      <div class="card">
+        <div class="status-note">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6">
+            <circle cx="12" cy="12" r="9" />
+            <line x1="12" y1="8" x2="12" y2="13" />
+            <line x1="12" y1="16" x2="12.01" y2="16" />
+          </svg>
+          <div>
+            <div class="t">Applying as {{ user.name }} — national ID {{ user.citizen_id }}</div>
+            <div class="d">Only issued passports with enough remaining validity are listed below.</div>
+          </div>
+        </div>
+
+        <form action="{{ url_for('visa') }}" method="post">
+          <div class="field">
+            <label>Passport <span class="req">*</span></label>
+            {% for p in eligible %}
+            <label class="passport-option{% if loop.first %} selected{% endif %}">
+              <input type="radio" name="passport_id" value="{{ p.passport_id }}" {% if loop.first %}checked{% endif %} required>
+              <div class="left">
+                <div class="id">{{ p.passport_id }} &middot; {{ p.passport_type|capitalize }}</div>
+                <div class="exp">Valid until {{ p.expiry_date }}</div>
+              </div>
+              <span class="eligible-tag">Eligible</span>
+            </label>
+            {% else %}
+            <div class="hint" style="color:var(--clay);">No eligible issued passports. You need an issued passport valid for 6+ months.</div>
+            {% endfor %}
+          </div>
+
+          <div class="field">
+            <label>Visa type <span class="req">*</span></label>
+            <div class="type-options" id="visaTypeOptions">
+              <label class="type-option selected">
+                <input type="radio" name="visa_type" value="tourist" data-fee="100" checked>
+                <div class="name">Tourist</div>
+                <div class="desc">Short stay / leisure</div>
+                <div class="price">GH₵ 100</div>
+              </label>
+              <label class="type-option">
+                <input type="radio" name="visa_type" value="work" data-fee="150">
+                <div class="name">Work</div>
+                <div class="desc">Employment travel</div>
+                <div class="price">GH₵ 150</div>
+              </label>
+              <label class="type-option">
+                <input type="radio" name="visa_type" value="student" data-fee="120">
+                <div class="name">Student</div>
+                <div class="desc">Study abroad</div>
+                <div class="price">GH₵ 120</div>
+              </label>
+              <label class="type-option">
+                <input type="radio" name="visa_type" value="transit" data-fee="80">
+                <div class="name">Transit</div>
+                <div class="desc">Passing through</div>
+                <div class="price">GH₵ 80</div>
+              </label>
+              <label class="type-option">
+                <input type="radio" name="visa_type" value="diplomatic" data-fee="200">
+                <div class="name">Diplomatic</div>
+                <div class="desc">Official mission</div>
+                <div class="price">GH₵ 200</div>
+              </label>
+            </div>
+            <div class="fee-due">
+              <span>Fee for selected type</span>
+              <strong id="visaFeeLabel">GH₵ 100.00</strong>
+            </div>
+          </div>
+
+          <div class="field">
+            <label>Destination country <span class="req">*</span></label>
+            <input type="text" name="destination" placeholder="United Kingdom" required>
+          </div>
+
+          <div class="app-row">
+            <div class="field">
+              <label>Requested issue date (demo) <span class="req">*</span></label>
+              <input type="date" name="issue_date" required>
+            </div>
+            <div class="field">
+              <label>Requested expiry date (demo) <span class="req">*</span></label>
+              <input type="date" name="expiry_date" required>
+              <div class="hint">Must be later than the issue date.</div>
+            </div>
+          </div>
+
+          <div class="field disabled-field">
+            <label>Status <span class="locked-pill">Set automatically</span></label>
+            <input type="text" value="Pending" disabled>
+          </div>
+
+          <div class="form-footer">
+            <a class="btn btn-ghost caps" href="{{ url_for('citizen') }}">Cancel</a>
+            <div class="form-footer-actions">
+              <button class="btn btn-primary caps" type="submit" {% if not eligible %}disabled{% endif %}>Continue to payment</button>
+              {% if not eligible %}
+              <p class="muted" style="margin:0;text-align:right;">Not eligible — need an issued passport valid 6+ months.</p>
+              {% endif %}
+            </div>
+          </div>
+        </form>
+      </div>
+
+      <aside>
+        <div class="card side-card">
+          <h3>Before you submit</h3>
+          <ul class="rule-list">
+            <li>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6">
+                <path d="M20 6 9 17l-5-5" />
+              </svg>
+              <span>Your passport must be valid for at least six months after the visa issue date.</span>
+            </li>
+            <li>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6">
+                <path d="M20 6 9 17l-5-5" />
+              </svg>
+              <span>Pending or rejected passports will not appear as eligible.</span>
+            </li>
+          </ul>
+        </div>
+
+        <div class="card side-card">
+          <h3>Visa fees</h3>
+          <table class="fee-table" id="visaFeeTable">
+            <tr data-type="tourist" class="active"><td>Tourist</td><td>GH₵ 100.00</td></tr>
+            <tr data-type="student"><td>Student</td><td>GH₵ 120.00</td></tr>
+            <tr data-type="work"><td>Work</td><td>GH₵ 150.00</td></tr>
+            <tr data-type="transit"><td>Transit</td><td>GH₵ 80.00</td></tr>
+            <tr data-type="diplomatic"><td>Diplomatic</td><td>GH₵ 200.00</td></tr>
+          </table>
+        </div>
+      </aside>
+    </div>
+  </div>
+</main>
+{% endblock %}
+
+{% block scripts %}
+<script>
+  function syncPassportPick() {
+    document.querySelectorAll('.passport-option').forEach(opt => {
+      const input = opt.querySelector('input');
+      opt.classList.toggle('selected', !!(input && input.checked));
+    });
+  }
+
+  function syncVisaType() {
+    const checked = document.querySelector('input[name="visa_type"]:checked');
+    if (!checked) return;
+    document.querySelectorAll('.type-option').forEach(o => {
+      o.classList.toggle('selected', o.contains(checked));
+    });
+    const fee = Number(checked.dataset.fee || 0);
+    const label = document.getElementById('visaFeeLabel');
+    if (label) label.textContent = 'GH₵ ' + fee.toFixed(2);
+    document.querySelectorAll('#visaFeeTable tr[data-type]').forEach(row => {
+      row.classList.toggle('active', row.dataset.type === checked.value);
+    });
+  }
+
+  document.querySelectorAll('.passport-option').forEach(opt => {
+    opt.addEventListener('click', function () {
+      const input = opt.querySelector('input');
+      if (!input) return;
+      input.checked = true;
+      syncPassportPick();
+    });
+    const input = opt.querySelector('input');
+    if (input) input.addEventListener('change', syncPassportPick);
+  });
+
+  document.querySelectorAll('.type-option').forEach(opt => {
+    opt.addEventListener('click', function () {
+      const input = opt.querySelector('input');
+      if (!input) return;
+      input.checked = true;
+      syncVisaType();
+    });
+  });
+  document.querySelectorAll('input[name="visa_type"]').forEach(input => {
+    input.addEventListener('change', syncVisaType);
+  });
+
+  syncPassportPick();
+  syncVisaType();
+</script>
+{% endblock %}

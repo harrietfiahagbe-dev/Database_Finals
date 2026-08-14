@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block title %}NPIMS — {{ title }}{% endblock %}
+{% block flashes %}{% endblock %}
+{% block content %}
+<main class="page-main">
+  <div class="wrap-narrow" style="text-align:center;padding-top:48px;">
+    <div style="font-family:'Fraunces',serif;font-size:64px;color:var(--forest);line-height:1;">{{ code }}</div>
+    <h1 style="margin:12px 0;">{{ title }}</h1>
+    <p class="muted" style="margin-bottom:24px;">
+      {% if code == 404 %}That page is not part of NPIMS.{% else %}Please try again in a moment.{% endif %}
+    </p>
+    <a class="btn btn-primary" href="{{ url_for('landing') }}">Back home</a>
+  </div>
+</main>
+{% endblock %}

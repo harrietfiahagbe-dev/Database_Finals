@@ -1,0 +1,393 @@
+{% extends "base.html" %}
+{% block title %}NPIMS — My dashboard{% endblock %}
+{% block extra_css %}
+<style>
+  .citizen-main {
+    padding: 44px 0 80px;
+  }
+
+  .page-head {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 20px;
+    margin-bottom: 34px;
+    flex-wrap: wrap;
+  }
+
+  .page-head .eyebrow {
+    font-size: 11.5px;
+    color: var(--clay);
+    margin-bottom: 8px;
+    display: block;
+  }
+
+  .page-head h1 {
+    font-size: 30px;
+    margin-bottom: 0;
+  }
+
+  .page-head p {
+    font-size: 13.5px;
+    color: var(--ink-soft);
+    margin-top: 6px;
+    margin-bottom: 0;
+    max-width: 460px;
+  }
+
+  .head-actions {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+
+  .top-grid {
+    display: grid;
+    grid-template-columns: 1.3fr 1fr 1fr 1fr;
+    gap: 16px;
+    margin-bottom: 36px;
+  }
+
+  @media (max-width: 900px) {
+    .top-grid {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+
+  @media (max-width: 720px) {
+    .top-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .profile-card {
+    display: flex;
+    gap: 16px;
+    align-items: flex-start;
+  }
+
+  .profile-card .pic {
+    width: 52px;
+    height: 52px;
+    border-radius: 50%;
+    background: var(--forest);
+    color: var(--cream);
+    font-family: 'Fraunces', serif;
+    font-weight: 600;
+    font-size: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex: none;
+  }
+
+  .profile-card h3 {
+    font-size: 16px;
+    margin-bottom: 2px;
+  }
+
+  .profile-card .meta {
+    font-size: 12px;
+    color: var(--ink-soft);
+    margin-bottom: 10px;
+  }
+
+  .profile-card .facts {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px 14px;
+    font-size: 12px;
+  }
+
+  .profile-card .facts dt {
+    color: var(--ink-soft);
+    text-transform: uppercase;
+    letter-spacing: .05em;
+    font-size: 10px;
+    margin-bottom: 2px;
+  }
+
+  .profile-card .facts dd {
+    color: var(--ink);
+    font-weight: 500;
+  }
+
+  .stat-card .stat-label {
+    font-size: 11px;
+    color: var(--ink-soft);
+    text-transform: uppercase;
+    letter-spacing: .06em;
+    margin-bottom: 10px;
+  }
+
+  .stat-card .stat-num {
+    font-family: 'Fraunces', serif;
+    font-size: 32px;
+    color: var(--forest);
+    line-height: 1;
+  }
+
+  .stat-card .stat-sub {
+    font-size: 12px;
+    color: var(--ink-soft);
+    margin-top: 8px;
+  }
+
+  section.block {
+    margin-bottom: 40px;
+  }
+
+  .block-head h2 {
+    font-size: 19px;
+  }
+
+  .block-head .see-all {
+    font-size: 12.5px;
+    color: var(--clay);
+    font-weight: 500;
+  }
+
+  .mono {
+    letter-spacing: .02em;
+    color: var(--ink-soft);
+    font-size: 12.5px;
+  }
+
+  .badge .dot {
+    display: inline-block;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    margin-right: 4px;
+    vertical-align: middle;
+    background: currentColor;
+  }
+
+  .dash-banner {
+    display: flex;
+    gap: 14px;
+    align-items: flex-start;
+    background: var(--cream-2);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 18px 20px;
+    margin-bottom: 36px;
+  }
+
+  .dash-banner svg {
+    width: 20px;
+    height: 20px;
+    color: var(--clay);
+    flex: none;
+    margin-top: 2px;
+  }
+
+  .dash-banner .t {
+    font-size: 13.5px;
+    font-weight: 500;
+    color: var(--forest);
+    margin-bottom: 2px;
+  }
+
+  .dash-banner .d {
+    font-size: 12.5px;
+    color: var(--ink-soft);
+  }
+
+  .status-cell {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<main class="citizen-main">
+  <div class="wrap-wide">
+    <div class="page-head">
+      <div>
+        <span class="eyebrow caps">Citizen dashboard</span>
+        <h1>Akwaaba back, {{ person.fname }}</h1>
+        <p>Everything tied to your national ID in one place — applications, payments, and status, updated as officers
+          process them.</p>
+      </div>
+      <div class="head-actions">
+        <a class="btn btn-ghost caps" href="{{ url_for('track') }}">Track application</a>
+        <a class="btn btn-primary caps" href="{{ url_for('passport') }}">Apply for passport</a>
+      </div>
+    </div>
+
+    <div class="top-grid">
+      <div class="card profile-card">
+        <div class="pic">{{ person.fname[0] }}{{ person.lname[0] }}</div>
+        <div>
+          <h3>{{ person.fname }} {{ person.lname }}</h3>
+          <div class="meta">National ID {{ person.nat_idcard }}{% if person.age %} &middot; Age {{ person.age }}{% endif %}{% if person.gender == 'F' %} &middot; she/her{% elif person.gender == 'M' %} &middot; he/him{% endif %}</div>
+          <dl class="facts">
+            <div>
+              <dt>Email</dt>
+              <dd>{{ person.email or '—' }}</dd>
+            </div>
+            <div>
+              <dt>Home address</dt>
+              <dd>{{ person.home_address }}</dd>
+            </div>
+          </dl>
+        </div>
+      </div>
+      <div class="card stat-card">
+        <div class="stat-label">Passport status</div>
+        <div class="stat-num" style="font-size:22px;">{{ (view_passport_status or 'None')|capitalize }}</div>
+        <div class="stat-sub">{% if active_passport %}{{ active_passport.passport_id }}{% if active_passport.expiry_date %} &middot; expires {{ active_passport.expiry_date }}{% endif %} · from vw_citizen_summary{% else %}Apply to get started{% endif %}</div>
+      </div>
+      <div class="card stat-card">
+        <div class="stat-label">Active &amp; pending visas</div>
+        <div class="stat-num">{{ visas|length }}</div>
+        <div class="stat-sub">{{ visas|selectattr('status','equalto','pending')|list|length }} pending review</div>
+      </div>
+      <div class="card stat-card">
+        <div class="stat-label">Total paid to date</div>
+        <div class="stat-num">GH₵ {{ '%.0f'|format(total_paid) }}</div>
+        <div class="stat-sub">{{ payments|length }} payment record{{ 's' if payments|length != 1 else '' }}</div>
+      </div>
+    </div>
+
+    <section class="block">
+      <div class="block-head">
+        <h2>My passports</h2>
+        <a class="btn btn-primary btn-sm" href="{{ url_for('passport') }}">Apply for passport</a>
+      </div>
+      <div class="card" style="padding:0;overflow:hidden;">
+        <div class="table-scroll">
+          <table class="data">
+            <thead>
+              <tr>
+                <th>Passport ID</th>
+                <th>Type</th>
+                <th>Issue date</th>
+                <th>Expiry date</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for p in passports %}
+              <tr>
+                <td class="mono">{{ p.passport_id }}</td>
+                <td>{{ p.passport_type|capitalize }}</td>
+                <td>{{ p.issue_date or '—' }}</td>
+                <td>{{ p.expiry_date or '—' }}</td>
+                <td>
+                  <div class="status-cell">
+                    <span class="badge badge-{{ p.status }}"><span class="dot"></span>{{ p.status|capitalize }}</span>
+                    {% if p.needs_payment %}
+                    <a class="btn btn-clay btn-sm" href="{{ url_for('payment', kind='passport', ref=p.passport_id) }}">Pay now</a>
+                    {% endif %}
+                  </div>
+                </td>
+              </tr>
+              {% else %}
+              <tr><td colspan="5">No passports yet. <a class="btn btn-primary btn-sm" href="{{ url_for('passport') }}">Apply now</a></td></tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <section class="block">
+      <div class="block-head">
+        <h2>My visas</h2>
+        <a class="btn btn-primary btn-sm" href="{{ url_for('visa') }}">Apply for visa</a>
+      </div>
+      <div class="card" style="padding:0;overflow:hidden;">
+        <div class="table-scroll">
+          <table class="data">
+            <thead>
+              <tr>
+                <th>Visa ID</th>
+                <th>Type</th>
+                <th>Destination</th>
+                <th>Passport used</th>
+                <th>Expiry date</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for v in visas %}
+              <tr>
+                <td class="mono">{{ v.visa_id }}</td>
+                <td>{{ v.visa_type|capitalize }}</td>
+                <td>{{ v.destination }}</td>
+                <td class="mono">{{ v.passport_id }}</td>
+                <td>{{ v.expiry_date }}</td>
+                <td>
+                  <div class="status-cell">
+                    <span class="badge badge-{{ v.status }}"><span class="dot"></span>{{ v.status|capitalize }}</span>
+                    {% if v.needs_payment %}
+                    <a class="btn btn-clay btn-sm" href="{{ url_for('payment', kind='visa', ref=v.visa_id) }}">Pay now</a>
+                    {% endif %}
+                  </div>
+                </td>
+              </tr>
+              {% else %}
+              <tr><td colspan="6">No visas yet. <a class="btn btn-primary btn-sm" href="{{ url_for('visa') }}">Apply now</a></td></tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <section class="block">
+      <div class="block-head">
+        <h2>My payments</h2>
+        <a class="see-all caps" href="{{ url_for('track') }}">Track &rarr;</a>
+      </div>
+      <div class="card" style="padding:0;overflow:hidden;">
+        <div class="table-scroll">
+          <table class="data">
+            <thead>
+              <tr>
+                <th>Payment ID</th>
+                <th>For</th>
+                <th>Amount</th>
+                <th>Method</th>
+                <th>Date</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for pay in payments %}
+              <tr>
+                <td class="mono">#{{ pay.payment_id }}</td>
+                <td>{% if pay.passport_id %}Passport {{ pay.passport_id }}{% elif pay.visa_id %}Visa {{ pay.visa_id }}{% else %}—{% endif %}</td>
+                <td>GH₵ {{ '%.2f'|format(pay.amount) }}</td>
+                <td>{{ pay.payment_method|capitalize }}</td>
+                <td>{{ pay.payment_date }}</td>
+                <td><span class="badge badge-{{ pay.status }}"><span class="dot"></span>{{ pay.status|capitalize }}</span></td>
+              </tr>
+              {% else %}
+              <tr><td colspan="6">No payments yet.</td></tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <div class="dash-banner">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6">
+        <circle cx="12" cy="12" r="9" />
+        <line x1="12" y1="8" x2="12" y2="13" />
+        <line x1="12" y1="16" x2="12.01" y2="16" />
+      </svg>
+      <div>
+        <div class="t">Only your own record is shown here</div>
+        <div class="d">This dashboard is filtered to national ID {{ person.nat_idcard }} — no citizen can view another citizen's applications or payments.</div>
+      </div>
+    </div>
+  </div>
+</main>
+{% endblock %}

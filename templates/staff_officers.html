@@ -1,0 +1,58 @@
+{% extends "staff_base.html" %}
+{% block title %}Officers{% endblock %}
+{% block content %}
+<div class="page-head">
+  <h1>Immigration officers</h1>
+  <p class="muted">{% if role_rank >= 4 %}Admin can add/edit officers (creates login with password123).{% else %}Read-only.{% endif %}</p>
+</div>
+{% if role_rank >= 4 %}
+<div class="card">
+  <h2>{{ 'Edit officer #' ~ edit_officer.officer_id if edit_officer else 'Add officer' }}</h2>
+  <form method="post" action="{{ url_for('staff_officers') }}" class="form-grid" style="margin-top:12px;">
+    <input type="hidden" name="action" value="{{ 'update' if edit_officer else 'create' }}">
+    <div><label>Officer ID</label><input name="officer_id" type="number" required value="{{ edit_officer.officer_id if edit_officer else '' }}" {% if edit_officer %}readonly{% endif %}></div>
+    <div><label>First name</label><input name="fname" required value="{{ edit_officer.fname if edit_officer else '' }}"></div>
+    <div><label>Last name</label><input name="lname" required value="{{ edit_officer.lname if edit_officer else '' }}"></div>
+    <div><label>Position</label>
+      <select name="position" required>
+        {% for p in ['officer','senior officer','supervisor','director'] %}
+        <option value="{{ p }}" {% if edit_officer and edit_officer.position==p %}selected{% endif %}>{{ p }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div><label>Phone</label><input name="phone_number" required value="{{ edit_officer.phone_number if edit_officer else '' }}"></div>
+    <div><label>Border post</label>
+      <select name="post_id" required>
+        {% for post in posts %}
+        <option value="{{ post.post_id }}" {% if edit_officer and edit_officer.post_id==post.post_id %}selected{% endif %}>{{ post.border_name }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="full"><button class="btn btn-primary" type="submit">{{ 'Update' if edit_officer else 'Create' }}</button>
+      {% if edit_officer %}<a class="btn" href="{{ url_for('staff_officers') }}">Cancel</a>{% endif %}
+    </div>
+  </form>
+</div>
+{% endif %}
+<div class="card">
+  <table>
+    <thead><tr><th>ID</th><th>Name</th><th>Position</th><th>Phone</th><th>Post</th>{% if role_rank >= 4 %}<th></th>{% endif %}</tr></thead>
+    <tbody>
+    {% for o in rows %}
+    <tr>
+      <td>{{ o.officer_id }}</td>
+      <td>{{ o.fname }} {{ o.lname }}</td>
+      <td>{{ o.position }}</td>
+      <td>{{ o.phone_number }}</td>
+      <td>{{ o.border_name or o.post_id }}</td>
+      {% if role_rank >= 4 %}
+      <td><a class="btn" href="{{ url_for('staff_officers', edit=o.officer_id) }}">Edit</a></td>
+      {% endif %}
+    </tr>
+    {% else %}
+    <tr><td colspan="6">No officers.</td></tr>
+    {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

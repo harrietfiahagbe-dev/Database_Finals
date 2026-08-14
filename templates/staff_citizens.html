@@ -1,0 +1,53 @@
+{% extends "staff_base.html" %}
+{% block title %}Citizens{% endblock %}
+{% block content %}
+<div class="page-head">
+  <h1>Citizens</h1>
+  <p class="muted">Search and filter citizen records. Supervisor+ can update email and address.</p>
+</div>
+<div class="card">
+  <form class="filters" method="get">
+    <div class="field"><label for="q">Search</label><input id="q" name="q" value="{{ q or '' }}" placeholder="Name or national ID"></div>
+    <div class="field"><label for="gender">Gender</label>
+      <select id="gender" name="gender">
+        <option value="">Any</option>
+        <option value="M" {% if gender=='M' %}selected{% endif %}>Male</option>
+        <option value="F" {% if gender=='F' %}selected{% endif %}>Female</option>
+      </select>
+    </div>
+    <div class="field"><label>&nbsp;</label><button class="btn btn-primary" type="submit">Filter</button></div>
+  </form>
+  <div class="filter-meta">
+    <span class="muted">{{ rows|length }} result{{ 's' if rows|length != 1 else '' }}</span>
+    <a href="{{ url_for('staff_citizens') }}">Clear filters</a>
+  </div>
+  <div class="table-scroll">
+  <table>
+    <thead><tr><th>National ID</th><th>Name</th><th>Gender</th>{% if role_rank >= 3 %}<th>Update contact</th>{% else %}<th>Email</th><th>Address</th>{% endif %}</tr></thead>
+    <tbody>
+    {% for c in rows %}
+    <tr>
+      <td>{{ c.nat_idcard }}</td>
+      <td>{{ c.fname }} {{ c.lname }}</td>
+      <td>{{ c.gender or '—' }}</td>
+      {% if role_rank >= 3 %}
+      <td>
+        <form method="post" action="{{ url_for('staff_citizen_update', nat_idcard=c.nat_idcard) }}" class="actions-stack">
+          <input name="email" placeholder="Email" value="{{ c.email or '' }}" aria-label="Email">
+          <input name="home_address" placeholder="Address" value="{{ c.home_address or '' }}" aria-label="Address">
+          <button class="btn btn-primary btn-sm" type="submit">Save</button>
+        </form>
+      </td>
+      {% else %}
+      <td>{{ c.email or '—' }}</td>
+      <td>{{ c.home_address }}</td>
+      {% endif %}
+    </tr>
+    {% else %}
+    <tr><td colspan="5">No citizens found.</td></tr>
+    {% endfor %}
+    </tbody>
+  </table>
+  </div>
+</div>
+{% endblock %}
