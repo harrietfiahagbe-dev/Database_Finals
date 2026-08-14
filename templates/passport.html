@@ -338,15 +338,23 @@
             </div>
           </div>
 
-          <div class="app-row">
+            <div class="app-row">
             <div class="field disabled-field">
               <label>Proposed issue date <span class="locked-pill">Set by officer</span></label>
-              <input type="text" id="proposedIssueDate" value="{{ proposed['ordinary'][0].strftime('%d %b %Y') }}" disabled>
+              {% if proposed is defined and 'ordinary' in proposed and proposed['ordinary']|length > 0 %}
+                <input type="text" id="proposedIssueDate" value="{{ proposed['ordinary'][0].strftime('%d %b %Y') }}" disabled>
+              {% else %}
+                <input type="text" id="proposedIssueDate" value="" disabled>
+              {% endif %}
               <div class="hint">Estimated — the officer confirms the real date at approval.</div>
             </div>
             <div class="field disabled-field">
               <label>Proposed expiry date <span class="locked-pill">Set by officer</span></label>
-              <input type="text" id="proposedExpiryDate" value="{{ proposed['ordinary'][1].strftime('%d %b %Y') }}" disabled>
+              {% if proposed is defined and 'ordinary' in proposed and proposed['ordinary']|length > 1 %}
+                <input type="text" id="proposedExpiryDate" value="{{ proposed['ordinary'][1].strftime('%d %b %Y') }}" disabled>
+              {% else %}
+                <input type="text" id="proposedExpiryDate" value="" disabled>
+              {% endif %}
               <div class="hint">Based on passport type and your age on file.</div>
             </div>
           </div>
@@ -420,12 +428,14 @@
 {% block scripts %}
 <script>
   const PROPOSED_DATES = {
-    {% for ptype, dates in proposed.items() %}
-    "{{ ptype }}": {
-      issue: "{{ dates[0].strftime('%d %b %Y') }}",
-      expiry: "{{ dates[1].strftime('%d %b %Y') }}"
-    },
-    {% endfor %}
+    {% if proposed is defined %}
+      {% for ptype, dates in proposed.items() %}
+      "{{ ptype }}": {
+        issue: "{{ dates[0].strftime('%d %b %Y') }}",
+        expiry: "{{ dates[1].strftime('%d %b %Y') }}"
+      }{% if not loop.last %},{% endif %}
+      {% endfor %}
+    {% endif %}
   };
 
   function syncPassportType() {

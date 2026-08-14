@@ -607,15 +607,7 @@ FROM Payment
 ORDER BY Payment.payment_date DESC;
 
 select * from vw_payment_overview;
-
-
-
-
-
-
-
-
-
+ 
 /*PROCEDURES*/
 /*A safe way to log a border crossing, it checks that the passport being used hasn't expired, 
 and only then records the entry or exit; if the passport is expired or doesn't exist,
