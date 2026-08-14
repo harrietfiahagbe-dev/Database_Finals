@@ -1,25 +1,51 @@
-/* NPIMS shared design system — institutional forest / clay / gold */
+/* NPIMS shared design system — neutral-first, institutional green, selective gold */
 
 :root {
-  --cream: #F5F2EA;
-  --cream-2: #EEE8D9;
-  --forest: #0E3D28;
-  --forest-deep: #0A2E1E;
+  /* institutional green scale */
+  --green-950: #073B2D;
+  --green-900: #0A4635;
+  --green-800: #125744;
+  --green-700: #1C6953;
+
+  /* gold — identity accent only, muted/desaturated */
+  --gold-600: #B78A32;
+  --gold-500: #C79A3B;
+  --gold-700: #96702A;
+
+  /* ink */
+  --ink-900: #17211D;
+  --ink-700: #45504B;
+  --ink-500: #707873;
+
+  /* neutral surfaces */
+  --surface: #FFFFFF;
+  --surface-warm: #FAFAF8;
+  --surface-soft: #F3F5F2;
+  --border: #E2E5E1;
+  --border-strong: #D3D8D3;
+
+  /* legacy aliases kept so existing component rules stay in sync automatically */
+  --cream: var(--surface-warm);
+  --cream-2: var(--surface-soft);
+  --forest: var(--green-900);
+  --forest-deep: var(--green-950);
   --clay: #8C2A28;
   --clay-light: #A8433A;
-  --gold: #9C7A2E;
-  --gold-dark: #7A5F23;
-  --ink: #18160F;
-  --ink-soft: #4B4A41;
-  --ink-faint: #8A8879;
-  --line: #DBD4C2;
+  --gold: var(--gold-600);
+  --gold-dark: var(--gold-700);
+  --ink: var(--ink-900);
+  --ink-soft: var(--ink-700);
+  --ink-faint: var(--ink-500);
+  --line: var(--border);
+  --line-strong: var(--border-strong);
+
   --radius: 10px;
   --ok: #2F6B48;
   --warn: #8C2A28;
   --pending: #7A6423;
-  --shadow-sm: 0 1px 2px rgba(24, 22, 15, 0.06);
-  --shadow-md: 0 8px 24px rgba(24, 22, 15, 0.09);
-  --focus-ring: 0 0 0 3px rgba(156, 122, 46, 0.45);
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.02), 0 6px 20px rgba(0, 0, 0, 0.025);
+  --shadow-md: 0 2px 4px rgba(0, 0, 0, 0.03), 0 10px 28px rgba(0, 0, 0, 0.04);
+  --focus-ring: 0 0 0 3px rgba(18, 87, 68, 0.35);
   --transition: 0.18s ease;
 }
 
@@ -246,7 +272,7 @@ button, input, select, textarea {
   bottom: 2px;
   height: 1.5px;
   width: 0;
-  background: var(--clay);
+  background: var(--forest);
   transition: width 0.25s ease;
 }
 
@@ -343,15 +369,16 @@ button, input, select, textarea {
 }
 
 .btn-gold {
-  background: var(--gold);
-  color: var(--forest-deep);
-  border-color: var(--gold);
+  background: #F7F5EF;
+  color: var(--green-950);
+  border-color: #F7F5EF;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08);
 }
 
 .btn-gold:hover {
-  background: #b18f42;
-  border-color: #b18f42;
-  color: var(--forest-deep);
+  background: #FFFFFF;
+  border-color: #FFFFFF;
+  color: var(--green-950);
 }
 
 .btn-outline-light {
@@ -631,7 +658,7 @@ table.data td,
 .footer-help {
   font-size: 13px;
   font-weight: 600;
-  color: var(--gold);
+  color: rgba(255, 255, 255, 0.82);
   display: inline-flex;
   align-items: center;
   gap: 8px;
@@ -645,7 +672,7 @@ table.data td,
 }
 
 .footer-help:hover {
-  color: #d4a84c;
+  color: #fff;
 }
 
 .footer-links-row {
@@ -677,7 +704,7 @@ table.data td,
 }
 
 .foot-group a:hover {
-  color: var(--gold);
+  color: #fff;
 }
 
 .foot-row {
@@ -819,7 +846,11 @@ table.data td,
 
 .hero h1 em {
   font-style: normal;
-  color: var(--gold);
+  color: #F5F2E8;
+  text-decoration: underline;
+  text-decoration-color: var(--gold);
+  text-decoration-thickness: 2px;
+  text-underline-offset: 6px;
 }
 
 .hero .lede {
@@ -869,7 +900,7 @@ table.data td,
 
 .hero-art .arc {
   position: absolute;
-  border: 1px solid rgba(156, 122, 46, 0.25);
+  border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 50%;
 }
 
@@ -901,7 +932,7 @@ table.data td,
   font-size: 10.5px;
   letter-spacing: 0.12em;
   text-transform: uppercase;
-  color: var(--gold);
+  color: rgba(247, 243, 236, 0.55);
   white-space: nowrap;
 }
 
@@ -918,7 +949,7 @@ table.data td,
   left: 50%;
   top: 50%;
   transform: translate(-58%, -52%) rotate(-6deg);
-  border: 1px solid rgba(156, 122, 46, 0.35);
+  border: 1px solid rgba(255, 255, 255, 0.14);
   padding: 24px 20px;
   color: #fff;
 }
@@ -936,7 +967,7 @@ table.data td,
   font-size: 13.5px;
   letter-spacing: 0.05em;
   text-transform: uppercase;
-  color: var(--gold);
+  color: rgba(255, 255, 255, 0.78);
 }
 
 .passport-book .p-sub {
@@ -1006,8 +1037,8 @@ table.data td,
 
 /* visa slide: document card variant */
 .passport-book--visa {
-  background: linear-gradient(160deg, #7a4a1f 0%, #5c3616 100%);
-  border-color: rgba(156, 122, 46, 0.45);
+  background: linear-gradient(160deg, #1c6953 0%, #0f4635 100%);
+  border-color: rgba(255, 255, 255, 0.14);
 }
 
 .passport-book--visa .visa-stamp {
@@ -1045,33 +1076,34 @@ table.data td,
   width: 9px;
   height: 9px;
   border-radius: 50%;
-  border: 1.4px solid var(--gold);
+  border: 1.4px solid rgba(255, 255, 255, 0.4);
   flex: none;
 }
 
 .track-progress .trow.is-done .tdot {
-  background: var(--gold);
+  background: rgba(255, 255, 255, 0.85);
+  border-color: rgba(255, 255, 255, 0.85);
 }
 
 .track-progress .tline {
   flex: 1;
   height: 1px;
-  background: rgba(156, 122, 46, 0.35);
+  background: rgba(255, 255, 255, 0.18);
 }
 
 .track-progress .trow.is-done .tline {
-  background: var(--gold);
+  background: rgba(255, 255, 255, 0.5);
 }
 
 .track-progress .tlabel {
   font-size: 9px;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: rgba(255, 255, 255, 0.55);
+  color: rgba(255, 255, 255, 0.4);
 }
 
 .track-progress .trow.is-done .tlabel {
-  color: var(--gold);
+  color: rgba(255, 255, 255, 0.85);
 }
 
 /* hero slideshow controls */
@@ -1103,8 +1135,8 @@ table.data td,
 
 .hero-nav:hover,
 .hero-nav:focus-visible {
-  border-color: var(--gold);
-  color: var(--gold);
+  border-color: rgba(255, 255, 255, 0.7);
+  color: #fff;
   outline: none;
 }
 
@@ -1151,22 +1183,7 @@ table.data td,
 /* —— Service gateway (light section) —— */
 .section--services {
   position: relative;
-  background: #F7F4EC;
-  overflow: hidden;
-}
-
-.section-watermark {
-  position: absolute;
-  top: 50%;
-  right: -6%;
-  width: 620px;
-  height: 620px;
-  transform: translateY(-50%);
-  opacity: 0.025;
-  stroke: var(--forest-deep);
-  fill: none;
-  stroke-width: 1;
-  pointer-events: none;
+  background: var(--surface-warm);
 }
 
 .gateway {
@@ -1188,35 +1205,19 @@ table.data td,
 .gateway-card {
   display: block;
   color: inherit;
+  background: var(--surface);
   border-radius: var(--radius);
-  border: 1px solid var(--line);
+  border: 1px solid var(--border);
   padding: 30px 30px 26px;
   transition: transform var(--transition), border-color var(--transition), box-shadow var(--transition);
 }
 
 .gateway-card:hover,
 .gateway-card:focus-visible {
-  transform: translateY(-3px);
+  transform: translateY(-2px);
+  border-color: var(--border-strong);
   box-shadow: var(--shadow-md);
   outline: none;
-}
-
-.gateway-card--passport {
-  background: #FCFAF5;
-  border-color: var(--line);
-}
-
-.gateway-card--passport:hover {
-  border-color: var(--forest);
-}
-
-.gateway-card--visa {
-  background: #FBF3E3;
-  border-color: #EAD9B4;
-}
-
-.gateway-card--visa:hover {
-  border-color: var(--gold);
 }
 
 .gateway-card .ic-wrap {
@@ -1227,30 +1228,18 @@ table.data td,
   align-items: center;
   justify-content: center;
   margin-bottom: 18px;
-  background: rgba(14, 61, 40, 0.08);
+  background: #EEF3F0;
   transition: background var(--transition);
 }
 
-.gateway-card--visa .ic-wrap {
-  background: rgba(156, 122, 46, 0.14);
-}
-
 .gateway-card:hover .ic-wrap {
-  background: rgba(14, 61, 40, 0.14);
-}
-
-.gateway-card--visa:hover .ic-wrap {
-  background: rgba(156, 122, 46, 0.24);
+  background: #E4ECE7;
 }
 
 .gateway-card .ic-wrap svg {
   width: 20px;
   height: 20px;
-  color: var(--forest-deep);
-}
-
-.gateway-card--visa .ic-wrap svg {
-  color: var(--gold-dark);
+  color: var(--green-800);
 }
 
 .gateway-card h3 {
@@ -1269,14 +1258,10 @@ table.data td,
 .gateway-card .go {
   font-size: 13.5px;
   font-weight: 700;
-  color: var(--forest);
+  color: var(--green-800);
   display: inline-flex;
   align-items: center;
   gap: 6px;
-}
-
-.gateway-card--visa .go {
-  color: var(--gold-dark);
 }
 
 .gateway-card .go svg {
@@ -1322,7 +1307,7 @@ table.data td,
   display: flex;
   align-items: center;
   justify-content: center;
-  background: var(--cream-2);
+  background: #EEF3F0;
   transition: transform var(--transition);
 }
 
@@ -1379,12 +1364,23 @@ table.data td,
 }
 
 .section-head .eyebrow-light {
-  display: inline-block;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
   font-size: 12px;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: var(--clay);
+  color: var(--green-700);
+  font-weight: 600;
   margin-bottom: 12px;
+}
+
+.section-head .eyebrow-light::before {
+  content: "";
+  width: 14px;
+  height: 1.5px;
+  background: var(--gold);
+  display: inline-block;
 }
 
 .section-head h2 {
@@ -1428,13 +1424,13 @@ table.data td,
 .process-line .line-seg[data-seg="1"] {
   left: 0;
   width: 50%;
-  background: var(--gold);
+  background: var(--border-strong);
 }
 
 .process-line .line-seg[data-seg="2"] {
   left: 50%;
   width: 50%;
-  background: var(--forest);
+  background: var(--border-strong);
 }
 
 .process.in-view .line-seg[data-seg="1"] {
@@ -1480,11 +1476,6 @@ table.data td,
   margin-bottom: 20px;
 }
 
-.process-step[data-step="1"] .step-node {
-  border-color: var(--gold);
-  color: var(--gold-dark);
-}
-
 .process-step h3 {
   font-size: 17px;
   margin-bottom: 8px;
@@ -1528,9 +1519,7 @@ table.data td,
 
 /* —— Sankofa —— */
 .signature {
-  background:
-    radial-gradient(700px 500px at 90% 10%, rgba(156, 122, 46, 0.08), transparent 60%),
-    linear-gradient(180deg, var(--forest) 0%, var(--forest-deep) 100%);
+  background: linear-gradient(180deg, var(--forest) 0%, var(--forest-deep) 100%);
   color: var(--cream);
   padding: 60px 0;
   position: relative;
@@ -1553,8 +1542,8 @@ table.data td,
   transform: translateY(-50%);
   width: 340px;
   height: 340px;
-  opacity: 0.07;
-  stroke: var(--gold);
+  opacity: 0.06;
+  stroke: var(--cream);
   fill: none;
   stroke-width: 1.2;
   animation: spin 60s linear infinite;
@@ -1594,15 +1583,15 @@ table.data td,
 }
 
 .signature .btn-primary {
-  background: var(--gold);
-  border-color: var(--gold);
-  color: var(--ink);
+  background: #F7F5EF;
+  border-color: #F7F5EF;
+  color: var(--green-950);
 }
 
 .signature .btn-primary:hover {
-  background: #d4a84c;
-  border-color: #d4a84c;
-  color: var(--ink);
+  background: #FFFFFF;
+  border-color: #FFFFFF;
+  color: var(--green-950);
 }
 
 .signature-visual {
@@ -1645,7 +1634,7 @@ table.data td,
 }
 
 .history-rows .hrow span:last-child {
-  color: var(--gold);
+  color: rgba(247, 243, 236, 0.55);
   white-space: nowrap;
   flex: none;
 }
