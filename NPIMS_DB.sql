@@ -1228,7 +1228,7 @@ SELECT COUNT(*) FROM app_account;  -- should return 10 demo logins
 SHOW TABLES;
 SELECT * FROM vw_citizen_summary LIMIT 5;
 
-/*CHECKING IF EVERYTHING IS THERE just trying*/
+/*CHECKING IF EVERYTHING IS THERE */
 
 
 
