@@ -8,68 +8,200 @@
     <svg class="sym3" viewBox="0 0 100 100"><path d="M20 80 C20 40 40 20 80 20"/><path d="M35 65 C35 40 50 30 75 30"/></svg>
     <svg class="sym4" viewBox="0 0 100 100"><rect x="20" y="20" width="60" height="60" rx="4"/><line x1="20" y1="50" x2="80" y2="50"/><line x1="50" y1="20" x2="50" y2="80"/></svg>
   </div>
-  <div class="wrap hero-inner">
-    <span class="eyebrow">Official government portal</span>
-    <h1>Akwaaba. Apply for your <em>passport</em> or <em>visa</em>, the modern way.</h1>
-    <p>One account, two services — submit your application, pay your fee, and track your status from anywhere.</p>
-    <div class="service-cards">
-      {% if user and user.account_type == 'citizen' %}
-      <a class="service-card" href="{{ url_for('passport') }}">
-        <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="4" y="3" width="16" height="18" rx="2"/><line x1="8" y1="8" x2="16" y2="8"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
-        <h3>Passport</h3>
-        <p>New passport application</p>
-        <span class="go">Apply for passport &rarr;</span>
-      </a>
-      <a class="service-card" href="{{ url_for('visa') }}">
-        <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M2 12h20M13 3c3 4 3 14 0 18M11 3C8 7 8 17 11 21"/></svg>
-        <h3>Visa</h3>
-        <p>Tourist, work, student, and more</p>
-        <span class="go">Apply for visa &rarr;</span>
-      </a>
-      {% elif user and user.account_type == 'staff' %}
-      <a class="service-card" href="{{ url_for('staff') }}">
-        <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="4" y="3" width="16" height="18" rx="2"/><line x1="8" y1="8" x2="16" y2="8"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
-        <h3>Staff desk</h3>
-        <p>Queue, travel log, and reports</p>
-        <span class="go">Open dashboard &rarr;</span>
-      </a>
-      {% else %}
-      <a class="service-card" href="{{ url_for('signup', intent='passport') }}">
-        <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="4" y="3" width="16" height="18" rx="2"/><line x1="8" y1="8" x2="16" y2="8"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
-        <h3>Passport</h3>
-        <p>New passport application</p>
-        <span class="go">Apply for passport &rarr;</span>
-      </a>
-      <a class="service-card" href="{{ url_for('signup', intent='visa') }}">
-        <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M2 12h20M13 3c3 4 3 14 0 18M11 3C8 7 8 17 11 21"/></svg>
-        <h3>Visa</h3>
-        <p>Tourist, work, student, and more</p>
-        <span class="go">Apply for visa &rarr;</span>
-      </a>
-      {% endif %}
+  <div class="wrap">
+    <div class="hero-grid">
+      <div>
+        <span class="eyebrow">Official government portal</span>
+        <h1>Akwaaba. Apply for your <em>passport</em> or <em>visa</em>, without the queue.</h1>
+        <p class="lede">One account handles both services — submit your application, settle the processing fee, and follow your file from intake to issuance.</p>
+        <div class="hero-ctas">
+          {% if user and user.account_type == 'citizen' %}
+          <a class="btn btn-gold" href="{{ url_for('passport') }}">Start an application</a>
+          <a class="btn btn-outline-light" href="{{ url_for('track') }}">Track existing application</a>
+          {% elif user and user.account_type == 'staff' %}
+          <a class="btn btn-gold" href="{{ url_for('staff') }}">Open staff dashboard</a>
+          {% else %}
+          <a class="btn btn-gold" href="{{ url_for('signup') }}">Start an application</a>
+          <a class="btn btn-outline-light" href="{{ url_for('login', next='/track') }}">Track existing application</a>
+          {% endif %}
+        </div>
+        <div class="hero-meta">
+          <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M12 22s8-4.5 8-11V5l-8-3-8 3v6c0 6.5 8 11 8 11Z"/></svg>Ghana Immigration Service</span>
+          <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M12 22s8-4.5 8-11V5l-8-3-8 3v6c0 6.5 8 11 8 11Z"/></svg>Ministry of Foreign Affairs</span>
+          <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="5" width="18" height="14" rx="1"/><path d="M3 8h18"/></svg>One secure account, one login</span>
+        </div>
+      </div>
+
+      <div class="hero-visual">
+        <div class="hero-art" aria-hidden="true">
+          <div class="arc" style="width:460px;height:460px;left:50%;top:50%;transform:translate(-50%,-50%);"></div>
+          <div class="arc" style="width:350px;height:350px;left:50%;top:50%;transform:translate(-50%,-50%);"></div>
+
+          <div class="hero-slides" id="heroSlides">
+            <div class="hero-slide is-active" data-slide="0">
+              <div class="doc-card passport-book">
+                <svg class="crest-lg" viewBox="0 0 40 40">
+                  <circle cx="20" cy="20" r="18" fill="none" stroke="#9C7A2E" stroke-width="1.4"/>
+                  <polygon points="20,9 22.5,17 31,17 24,22 26.5,30 20,25 13.5,30 16,22 9,17 17.5,17" fill="#9C7A2E"/>
+                </svg>
+                <div class="p-title">Republic of Ghana</div>
+                <div class="p-sub">National Passport &amp; Immigration Management System</div>
+                <div class="p-word">PASSPORT</div>
+              </div>
+              <span class="slide-label">Passport services</span>
+            </div>
+
+            <div class="hero-slide" data-slide="1">
+              <div class="doc-card passport-book passport-book--visa">
+                <svg class="crest-lg" viewBox="0 0 40 40">
+                  <circle cx="20" cy="20" r="18" fill="none" stroke="#F5F2EA" stroke-width="1.4"/>
+                  <polygon points="20,9 22.5,17 31,17 24,22 26.5,30 20,25 13.5,30 16,22 9,17 17.5,17" fill="#F5F2EA"/>
+                </svg>
+                <div class="p-title">Republic of Ghana</div>
+                <div class="p-sub">Entry &amp; Residence Visa</div>
+                <div class="p-word">VISA</div>
+                <div class="doc-card visa-stamp">
+                  <div class="inner">
+                    <div class="t1">Entry Visa</div>
+                    <div class="t2">Approved</div>
+                    <div class="t3">Rep. of Ghana</div>
+                  </div>
+                </div>
+              </div>
+              <span class="slide-label">Visa services</span>
+            </div>
+
+            <div class="hero-slide" data-slide="2">
+              <div class="doc-card passport-book passport-book--track">
+                <svg class="crest-lg" viewBox="0 0 40 40">
+                  <circle cx="20" cy="20" r="18" fill="none" stroke="#9C7A2E" stroke-width="1.4"/>
+                  <polygon points="20,9 22.5,17 31,17 24,22 26.5,30 20,25 13.5,30 16,22 9,17 17.5,17" fill="#9C7A2E"/>
+                </svg>
+                <div class="p-title">Republic of Ghana</div>
+                <div class="p-sub">Application Status</div>
+                <div class="track-progress">
+                  <div class="trow is-done"><span class="tdot"></span><span class="tline"></span><span class="tlabel">Submitted</span></div>
+                  <div class="trow is-done"><span class="tdot"></span><span class="tline"></span><span class="tlabel">Processing</span></div>
+                  <div class="trow"><span class="tdot"></span><span class="tline"></span><span class="tlabel">Decision</span></div>
+                </div>
+              </div>
+              <span class="slide-label">Track your application</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="hero-controls" role="group" aria-label="Hero illustration slides">
+          <button type="button" class="hero-nav hero-prev" aria-label="Previous slide">&#8249;</button>
+          <div class="hero-dots">
+            <button type="button" class="hero-dot is-active" data-goto="0" aria-label="Show passport services slide" aria-current="true"></button>
+            <button type="button" class="hero-dot" data-goto="1" aria-label="Show visa services slide"></button>
+            <button type="button" class="hero-dot" data-goto="2" aria-label="Show track application slide"></button>
+          </div>
+          <button type="button" class="hero-nav hero-next" aria-label="Next slide">&#8250;</button>
+          <span class="sr-only" id="heroSlideAnnounce" aria-live="polite"></span>
+        </div>
+      </div>
     </div>
   </div>
 </section>
 
-<div class="trust">
-  <div class="trust-row wrap">
-    <span><span class="dot"></span> Ghana Immigration Service</span>
-    <span><span class="dot"></span> Ministry of Foreign Affairs</span>
-    <span><span class="dot"></span> Secure account, one login</span>
-    <span><span class="dot"></span> Track status anytime</span>
-  </div>
-</div>
+<section class="section section--services" id="services">
+  <svg class="section-watermark" viewBox="0 0 100 100" aria-hidden="true">
+    <polygon points="50,4 60,38 96,38 66,58 78,94 50,72 22,94 34,58 4,38 40,38" fill="none" stroke="currentColor" stroke-width="0.6"/>
+  </svg>
+  <div class="wrap gateway">
+    <div class="section-head">
+      <span class="eyebrow-light">Services</span>
+      <h2>Two services, one account</h2>
+      <p>Choose the service you need, then follow your application from intake to issuance in the same place.</p>
+    </div>
 
-<section class="section">
+    <div class="gateway-primary">
+      {% if user and user.account_type == 'citizen' %}
+      <a class="gateway-card gateway-card--passport" href="{{ url_for('passport') }}">
+        <span class="ic-wrap"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="4" y="3" width="16" height="18" rx="2"/><line x1="8" y1="8" x2="16" y2="8"/><line x1="8" y1="12" x2="16" y2="12"/></svg></span>
+        <h3>Passport</h3>
+        <p>Apply for a Ghanaian passport with your Ghana Card details.</p>
+        <span class="go">Apply now <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
+      </a>
+      <a class="gateway-card gateway-card--visa" href="{{ url_for('visa') }}">
+        <span class="ic-wrap"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M2 12h20M13 3c3 4 3 14 0 18M11 3C8 7 8 17 11 21"/></svg></span>
+        <h3>Visa</h3>
+        <p>Tourist, work, student, and other visa categories.</p>
+        <span class="go">Explore visas <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
+      </a>
+      {% elif user and user.account_type == 'staff' %}
+      <a class="gateway-card gateway-card--passport" href="{{ url_for('staff') }}">
+        <span class="ic-wrap"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="4" y="3" width="16" height="18" rx="2"/><line x1="8" y1="8" x2="16" y2="8"/><line x1="8" y1="12" x2="16" y2="12"/></svg></span>
+        <h3>Staff desk</h3>
+        <p>Queue, travel log, and reports for officers on duty.</p>
+        <span class="go">Open dashboard <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
+      </a>
+      {% else %}
+      <a class="gateway-card gateway-card--passport" href="{{ url_for('signup', intent='passport') }}">
+        <span class="ic-wrap"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="4" y="3" width="16" height="18" rx="2"/><line x1="8" y1="8" x2="16" y2="8"/><line x1="8" y1="12" x2="16" y2="12"/></svg></span>
+        <h3>Passport</h3>
+        <p>Apply for a Ghanaian passport with your Ghana Card details.</p>
+        <span class="go">Apply now <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
+      </a>
+      <a class="gateway-card gateway-card--visa" href="{{ url_for('signup', intent='visa') }}">
+        <span class="ic-wrap"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M2 12h20M13 3c3 4 3 14 0 18M11 3C8 7 8 17 11 21"/></svg></span>
+        <h3>Visa</h3>
+        <p>Tourist, work, student, and other visa categories.</p>
+        <span class="go">Explore visas <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
+      </a>
+      {% endif %}
+    </div>
+
+    {% if not (user and user.account_type == 'staff') %}
+    <div class="gateway-utility">
+      <a class="util-row" href="{% if user and user.account_type == 'citizen' %}{{ url_for('track') }}{% else %}{{ url_for('login', next='/track') }}{% endif %}">
+        <span class="ic-wrap"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg></span>
+        <span class="util-text"><strong>Track application</strong><span>Check the status of an application you've already submitted.</span></span>
+        <span class="go"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
+      </a>
+      <a class="util-row" href="{{ url_for('eligibility') }}">
+        <span class="ic-wrap"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M9 12l2 2 4-4M12 3l8 4v5c0 5-3.5 8.5-8 9-4.5-.5-8-4-8-9V7l8-4Z"/></svg></span>
+        <span class="util-text"><strong>Eligibility &amp; fees</strong><span>Confirm requirements, fees and documents before applying.</span></span>
+        <span class="go"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
+      </a>
+    </div>
+    {% endif %}
+  </div>
+</section>
+
+<section class="section" style="padding-top:0;">
   <div class="wrap">
     <div class="section-head">
       <span class="eyebrow-light">How it works</span>
       <h2>Three steps, start to finish</h2>
     </div>
-    <div class="steps">
-      <div class="step"><div class="num">01</div><h3>Create your account</h3><p>Register once with your Ghana Card number — it becomes the home for every application you make.</p></div>
-      <div class="step"><div class="num">02</div><h3>Apply and pay</h3><p>Submit your passport or visa details, then record the fee so processing can begin.</p></div>
-      <div class="step"><div class="num">03</div><h3>Track and receive</h3><p>Follow your application's status in real time, from submission to approval.</p></div>
+    <div class="process" id="process">
+      <div class="process-track">
+        <div class="process-line" aria-hidden="true">
+          <span class="line-seg" data-seg="1"></span>
+          <span class="line-seg" data-seg="2"></span>
+        </div>
+        <div class="process-step" data-step="1">
+          <div class="step-node">01</div>
+          <h3>Create your account</h3>
+          <p>Register once with your Ghana Card number — it becomes the home for every application you make.</p>
+        </div>
+        <div class="process-step" data-step="2">
+          <div class="step-node">02</div>
+          <h3>Apply and pay</h3>
+          <p>Submit your passport or visa details, then record the fee so processing can begin.</p>
+        </div>
+        <div class="process-step" data-step="3">
+          <div class="step-node">03</div>
+          <h3>Track and receive</h3>
+          <p>Follow your application's status in real time, from submission to approval.</p>
+        </div>
+      </div>
+      <div class="inline-callout">
+        <p>Not sure what you need? Check eligibility and fees before starting.</p>
+        <a href="{{ url_for('eligibility') }}">Check eligibility <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+      </div>
     </div>
   </div>
 </section>
@@ -80,34 +212,120 @@
     <path d="M50 20 A30 30 0 1 1 49.9 20"/>
   </svg>
   <div class="wrap">
-    <div class="signature-inner">
-      <h2>Sankofa — go back and get it</h2>
-      <p>Your account keeps your history, so returning for another application never starts from zero.</p>
-      {% if user and user.account_type == 'citizen' %}
-      <a class="btn btn-primary" href="{{ url_for('citizen') }}">Go to dashboard</a>
-      {% elif user and user.account_type == 'staff' %}
-      <a class="btn btn-primary" href="{{ url_for('staff') }}">Staff dashboard</a>
-      {% else %}
-      <a class="btn btn-primary" href="{{ url_for('signup') }}">Get started</a>
-      {% endif %}
+    <div class="signature-grid">
+      <div class="signature-inner">
+        <h2>Sankofa — go back and get it</h2>
+        <p>Your account keeps your application history, so returning for another application never starts from zero.</p>
+        {% if user and user.account_type == 'citizen' %}
+        <a class="btn btn-primary" href="{{ url_for('citizen') }}">Go to my account &rarr;</a>
+        {% elif user and user.account_type == 'staff' %}
+        <a class="btn btn-primary" href="{{ url_for('staff') }}">Staff dashboard &rarr;</a>
+        {% else %}
+        <a class="btn btn-primary" href="{{ url_for('signup') }}">Get started &rarr;</a>
+        {% endif %}
+      </div>
+      <div class="signature-visual" aria-hidden="true">
+        <div class="history-rows">
+          <div class="hrow"><span>Passport renewal</span><span>Completed</span></div>
+          <div class="hrow"><span>Visa application</span><span>Approved</span></div>
+          <div class="hrow"><span>Previous application</span><span>Archived</span></div>
+        </div>
+        <div class="doc-card passport-book">
+          <svg class="crest-lg" viewBox="0 0 40 40">
+            <circle cx="20" cy="20" r="18" fill="none" stroke="#9C7A2E" stroke-width="1.4"/>
+            <polygon points="20,9 22.5,17 31,17 24,22 26.5,30 20,25 13.5,30 16,22 9,17 17.5,17" fill="#9C7A2E"/>
+          </svg>
+          <div class="p-title">Republic of Ghana</div>
+          <div class="p-sub">National Passport &amp; Immigration Management System</div>
+          <div class="p-word">PASSPORT</div>
+        </div>
+      </div>
     </div>
   </div>
 </section>
 {% endblock %}
 {% block scripts %}
 <script>
-  const steps = document.querySelectorAll('.step');
-  const io = new IntersectionObserver((entries) => {
-    entries.forEach((e) => {
-      if (e.isIntersecting) {
-        e.target.classList.add('in');
-        io.unobserve(e.target);
+(function () {
+  var reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  // —— Hero slideshow ——
+  var slidesWrap = document.getElementById('heroSlides');
+  if (slidesWrap) {
+    var slides = Array.prototype.slice.call(slidesWrap.querySelectorAll('.hero-slide'));
+    var dots = Array.prototype.slice.call(document.querySelectorAll('.hero-dot'));
+    var prevBtn = document.querySelector('.hero-prev');
+    var nextBtn = document.querySelector('.hero-next');
+    var announce = document.getElementById('heroSlideAnnounce');
+    var current = 0;
+    var timer = null;
+    var AUTOPLAY_MS = 6500;
+
+    function goTo(index, manual) {
+      if (index === current) return;
+      slides[current].classList.remove('is-active');
+      dots[current].classList.remove('is-active');
+      dots[current].removeAttribute('aria-current');
+      current = (index + slides.length) % slides.length;
+      slides[current].classList.add('is-active');
+      dots[current].classList.add('is-active');
+      dots[current].setAttribute('aria-current', 'true');
+      if (manual && announce) {
+        announce.textContent = dots[current].getAttribute('aria-label');
       }
+    }
+
+    function next(manual) { goTo(current + 1, manual); }
+    function prev(manual) { goTo(current - 1, manual); }
+
+    function startAutoplay() {
+      if (reduceMotion) return;
+      stopAutoplay();
+      timer = setInterval(function () { next(false); }, AUTOPLAY_MS);
+    }
+    function stopAutoplay() {
+      if (timer) { clearInterval(timer); timer = null; }
+    }
+
+    dots.forEach(function (dot, i) {
+      dot.addEventListener('click', function () { goTo(i, true); startAutoplay(); });
     });
-  }, { threshold: 0.2 });
-  steps.forEach((s, i) => {
-    s.style.transitionDelay = (i * 0.12) + 's';
-    io.observe(s);
-  });
+    if (nextBtn) nextBtn.addEventListener('click', function () { next(true); startAutoplay(); });
+    if (prevBtn) prevBtn.addEventListener('click', function () { prev(true); startAutoplay(); });
+
+    var visual = document.querySelector('.hero-visual');
+    if (visual) {
+      visual.addEventListener('mouseenter', stopAutoplay);
+      visual.addEventListener('mouseleave', startAutoplay);
+      visual.addEventListener('focusin', stopAutoplay);
+      visual.addEventListener('focusout', startAutoplay);
+      visual.addEventListener('keydown', function (e) {
+        if (e.key === 'ArrowRight') { next(true); startAutoplay(); }
+        if (e.key === 'ArrowLeft') { prev(true); startAutoplay(); }
+      });
+    }
+
+    startAutoplay();
+  }
+
+  // —— How it works: staged reveal ——
+  var process = document.getElementById('process');
+  if (process) {
+    if (reduceMotion) {
+      process.classList.add('in-view');
+    } else {
+      process.classList.add('js-armed');
+      var io = new IntersectionObserver(function (entries) {
+        entries.forEach(function (entry) {
+          if (entry.isIntersecting) {
+            process.classList.add('in-view');
+            io.unobserve(entry.target);
+          }
+        });
+      }, { threshold: 0.35 });
+      io.observe(process);
+    }
+  }
+})();
 </script>
 {% endblock %}

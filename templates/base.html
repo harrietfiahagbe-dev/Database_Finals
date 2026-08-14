@@ -5,19 +5,27 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>{% block title %}NPIMS{% endblock %}</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Work+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Spectral:wght@400;500;600;700&family=Public+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="{{ url_for('static', filename='npims.css') }}">
   {% block extra_css %}{% endblock %}
 </head>
 <body class="{% block body_class %}{% endblock %}">
   <div class="kente-strip" aria-hidden="true"></div>
+  {% block utility_bar %}
+  <div class="utility-bar">
+    <div class="utility-row">
+      <span><span class="dot-live"></span>Republic of Ghana &middot; Official government portal</span>
+      <span>Ghana Immigration Service &middot; Ministry of Foreign Affairs</span>
+    </div>
+  </div>
+  {% endblock %}
   {% block header %}
   <header class="site-header" id="siteHeader">
     <div class="nav-row">
       <a class="brand" href="{{ url_for('landing') }}">
         <svg class="coa" viewBox="0 0 40 40" aria-hidden="true">
-          <circle cx="20" cy="20" r="18" fill="none" stroke="#B5502E" stroke-width="1.4"/>
-          <polygon points="20,9 22.5,17 31,17 24,22 26.5,30 20,25 13.5,30 16,22 9,17 17.5,17" fill="#1E4D3A"/>
+          <circle cx="20" cy="20" r="18" fill="none" stroke="#8C2A28" stroke-width="1.4"/>
+          <polygon points="20,9 22.5,17 31,17 24,22 26.5,30 20,25 13.5,30 16,22 9,17 17.5,17" fill="#0E3D28"/>
         </svg>
         <div class="brand-text">
           <div class="name">NPIMS</div>
@@ -74,18 +82,45 @@
 
   {% block footer %}
   <footer class="site-footer">
-    <div class="wrap foot-row">
+    <div class="wrap footer-top-row">
       <div class="foot-brand">
         <svg class="coa" viewBox="0 0 40 40" aria-hidden="true">
-          <circle cx="20" cy="20" r="18" fill="none" stroke="#C9973F" stroke-width="1.4"/>
-          <polygon points="20,9 22.5,17 31,17 24,22 26.5,30 20,25 13.5,30 16,22 9,17 17.5,17" fill="#C9973F"/>
+          <circle cx="20" cy="20" r="18" fill="none" stroke="#9C7A2E" stroke-width="1.4"/>
+          <polygon points="20,9 22.5,17 31,17 24,22 26.5,30 20,25 13.5,30 16,22 9,17 17.5,17" fill="#9C7A2E"/>
         </svg>
-        <span>NPIMS · National Passport &amp; Immigration Management System</span>
+        <div>
+          <span class="name">NPIMS</span>
+          <p class="desc">National Passport &amp; Immigration Management System</p>
+        </div>
       </div>
-      <div class="foot-links">
-        <a href="{{ url_for('eligibility') }}">Eligibility</a>
-        <a href="{{ url_for('help_page') }}">Help</a>
+      <a class="footer-help" href="{{ url_for('help_page') }}">
+        <span>Need help?</span>
+        Visit the Help Centre &rarr;
+      </a>
+    </div>
+    <div class="wrap footer-links-row">
+      <div class="foot-group">
+        <h5>Services</h5>
+        {% if user and user.account_type == 'citizen' %}
+        <a href="{{ url_for('passport') }}">Passport</a>
+        <a href="{{ url_for('visa') }}">Visa</a>
+        <a href="{{ url_for('track') }}">Track application</a>
+        {% elif user and user.account_type == 'staff' %}
+        <a href="{{ url_for('staff') }}">Staff dashboard</a>
+        {% else %}
+        <a href="{{ url_for('login', intent='passport') }}">Passport</a>
+        <a href="{{ url_for('login', intent='visa') }}">Visa</a>
+        <a href="{{ url_for('login', next='/track') }}">Track application</a>
+        {% endif %}
       </div>
+      <div class="foot-group">
+        <h5>Resources</h5>
+        <a href="{{ url_for('eligibility') }}">Eligibility &amp; fees</a>
+        <a href="{{ url_for('help_page') }}">Help centre</a>
+      </div>
+    </div>
+    <div class="wrap foot-row">
+      <span>&copy; 2026 Government of Ghana. All rights reserved.</span>
     </div>
   </footer>
   {% endblock %}
