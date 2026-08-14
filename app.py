@@ -87,6 +87,7 @@ def _parse_date(value, label="Date"):
 
 # ── Auth helpers ──────────────────────────────────────────────────────────────
 
+
 def login_required(view):
     @wraps(view)
     def wrapped(*args, **kwargs):
@@ -259,7 +260,73 @@ def _resolve_login_account(raw_id, preferred_type="citizen"):
     return None, None, None
 
 
+# Date Helpers
+from datetime import date, timedelta
+
+
+def _add_working_days(start_date, days):
+    d = start_date
+    added = 0
+    while added < days:
+        d += timedelta(days=1)
+        if d.weekday() < 5:  # Mon=0 ... Fri=4, skips Sat/Sun
+            added += 1
+    return d
+
+
+def _add_years(d, years):
+    try:
+        return d.replace(year=d.year + years)
+    except ValueError:
+        # handles Feb 29 landing on a non-leap year
+        return d.replace(month=2, day=28, year=d.year + years)
+
+
+def _calculate_age(dob):
+    today = date.today()
+    return today.year - dob.year - ((today.month, today.day) < (dob.month, dob.day))
+
+
+def _passport_validity_years(ptype, dob):
+    if ptype in ("diplomatic", "official"):
+        return 5
+    if dob and _calculate_age(dob) < 12:
+        return 5
+    return 10  # ordinary, adult
+
+
+def _proposed_passport_dates(ptype, dob):
+    proposed_issue = _add_working_days(date.today(), 15)
+    proposed_expiry = _add_years(proposed_issue, _passport_validity_years(ptype, dob))
+    return proposed_issue, proposed_expiry
+
+
+VISA_VALIDITY_DAYS = {"tourist": 90, "transit": 3}
+VISA_VALIDITY_YEARS = {"student": 4, "work": 3, "diplomatic": 5}
+
+
+def _proposed_visa_dates(visa_type):
+    proposed_issue = date.today() + timedelta(days=30)
+    if visa_type in VISA_VALIDITY_DAYS:
+        proposed_expiry = proposed_issue + timedelta(days=VISA_VALIDITY_DAYS[visa_type])
+    elif visa_type in VISA_VALIDITY_YEARS:
+        proposed_expiry = _add_years(proposed_issue, VISA_VALIDITY_YEARS[visa_type])
+    else:
+        proposed_expiry = None
+    return proposed_issue, proposed_expiry
+
+
+# Visa helper
+def _visa_expiry_date(visa_type, issue_date):
+    if visa_type in VISA_VALIDITY_DAYS:
+        return issue_date + timedelta(days=VISA_VALIDITY_DAYS[visa_type])
+    elif visa_type in VISA_VALIDITY_YEARS:
+        return _add_years(issue_date, VISA_VALIDITY_YEARS[visa_type])
+    return None
+
+
 # ── Public routes ─────────────────────────────────────────────────────────────
+
 
 @app.route("/")
 def landing():
@@ -375,9 +442,7 @@ def signup():
         flash("Account created. Welcome!", "success")
         return _post_login_redirect("citizen", intent=intent, next_url=next_url)
 
-    return render_template(
-        "auth.html", mode="signup", intent=intent, next=next_url
-    )
+    return render_template("auth.html", mode="signup", intent=intent, next=next_url)
 
 
 @app.route("/login", methods=["GET", "POST"])
@@ -392,7 +457,9 @@ def login():
         password = request.form.get("password") or ""
 
         try:
-            account, account_type, login_id = _resolve_login_account(raw_id, preferred_type)
+            account, account_type, login_id = _resolve_login_account(
+                raw_id, preferred_type
+            )
             if not account:
                 flash("Invalid credentials.", "error")
                 return render_template(
@@ -452,18 +519,19 @@ def login():
             session["role"] = "citizen"
             session["name"] = f"{citizen['fname']} {citizen['lname']}"
             flash(f"Welcome back, {citizen['fname']}.", "success")
-            return _post_login_redirect(
-                "citizen", intent=intent, next_url=next_url
-            )
+            return _post_login_redirect("citizen", intent=intent, next_url=next_url)
         except (MySQLError, ValueError) as e:
-            flash(_mysql_message(e) if isinstance(e, MySQLError) else "Invalid credentials.", "error")
+            flash(
+                _mysql_message(e)
+                if isinstance(e, MySQLError)
+                else "Invalid credentials.",
+                "error",
+            )
             return render_template(
                 "auth.html", mode="login", intent=intent, next=next_url
             )
 
-    return render_template(
-        "auth.html", mode="login", intent=intent, next=next_url
-    )
+    return render_template("auth.html", mode="login", intent=intent, next=next_url)
 
 
 @app.route("/logout")
@@ -474,6 +542,7 @@ def logout():
 
 
 # ── Citizen routes ────────────────────────────────────────────────────────────
+
 
 @app.route("/citizen")
 @login_required
@@ -493,7 +562,11 @@ def citizen():
     if summary_rows:
         # Prefer an issued passport status from the view if present
         issued = next(
-            (r for r in summary_rows if (r.get("passport_status") or "").lower() == "issued"),
+            (
+                r
+                for r in summary_rows
+                if (r.get("passport_status") or "").lower() == "issued"
+            ),
             None,
         )
         if issued:
@@ -518,7 +591,9 @@ def citizen():
         if p.get("passport_id") and p["status"] == "completed"
     }
     paid_visas = {
-        p["visa_id"] for p in payments if p.get("visa_id") and p["status"] == "completed"
+        p["visa_id"]
+        for p in payments
+        if p.get("visa_id") and p["status"] == "completed"
     }
     for p in passports:
         p["needs_payment"] = (
@@ -526,12 +601,14 @@ def citizen():
             and p["passport_id"] not in paid_passports
         )
     for v in visas:
-        v["needs_payment"] = (
-            v["status"] == "pending" and v["visa_id"] not in paid_visas
-        )
+        v["needs_payment"] = v["status"] == "pending" and v["visa_id"] not in paid_visas
     active = next((p for p in passports if p["status"] == "issued"), None)
-    total_paid = float(summary["total_paid"]) if summary else float(
-        sum((p["amount"] or 0) for p in payments if p["status"] == "completed")
+    total_paid = (
+        float(summary["total_paid"])
+        if summary
+        else float(
+            sum((p["amount"] or 0) for p in payments if p["status"] == "completed")
+        )
     )
     view_passport_status = (
         (summary.get("passport_status") if summary else None)
@@ -558,67 +635,65 @@ def citizen():
 def passport():
     cid = session["citizen_id"]
     blocked = db.query(
-    "SELECT passport_id, status FROM passport "
-    "WHERE nat_idcard = %s AND ("
-    "  status IN ('pending', 'processing') "
-    "  OR (status = 'issued' AND expiry_date > DATE_ADD(CURDATE(), INTERVAL 6 MONTH))"
-    ") LIMIT 1",
-    (cid,),
-    one=True,
-)
+        "SELECT passport_id, status FROM passport "
+        "WHERE nat_idcard = %s AND ("
+        "  status IN ('pending', 'processing') "
+        "  OR (status = 'issued' AND expiry_date > DATE_ADD(CURDATE(), INTERVAL 6 MONTH))"
+        ") LIMIT 1",
+        (cid,),
+        one=True,
+    )
+    citizen = db.query(
+        "SELECT dob FROM citizen WHERE nat_idcard = %s", (cid,), one=True
+    )
+    dob = citizen["dob"] if citizen else None
+
+    proposed = {ptype: _proposed_passport_dates(ptype, dob) for ptype in PASSPORT_FEES}
+
     if request.method == "POST":
         if blocked:
-            flash(
-                f"You already have passport {blocked['passport_id']} in "
-                f"{blocked['status']}. Finish or wait for that one first.",
-                "error",
-            )
+            if blocked["status"] == "issued":
+                flash(
+                    f"You already have a valid passport ({blocked['passport_id']}). "
+                    "You can reapply once it's closer to expiry.",
+                    "error",
+                )
+            else:
+                flash(
+                    f"You already have passport {blocked['passport_id']} in "
+                    f"{blocked['status']}. Finish or wait for that one first.",
+                    "error",
+                )
             return render_template(
-                "passport.html", user=session, blocked=blocked
+                "passport.html", user=session, blocked=blocked, proposed=proposed
             )
+
         ptype = request.form.get("passport_type", "ordinary")
-        issue_date = request.form.get("issue_date") or None
-        expiry_date = request.form.get("expiry_date") or None
         if ptype not in PASSPORT_FEES:
             flash("Select a valid passport type.", "error")
             return render_template(
-                "passport.html", user=session, blocked=blocked
-            )
-        issue_d, issue_err = _parse_date(issue_date, "Issue date")
-        if issue_err:
-            flash(issue_err, "error")
-            return render_template(
-                "passport.html", user=session, blocked=blocked
-            )
-        expiry_d, expiry_err = _parse_date(expiry_date, "Expiry date")
-        if expiry_err:
-            flash(expiry_err, "error")
-            return render_template(
-                "passport.html", user=session, blocked=blocked
-            )
-        if expiry_d <= issue_d:
-            flash("Expiry date must be after issue date.", "error")
-            return render_template(
-                "passport.html", user=session, blocked=blocked
+                "passport.html", user=session, blocked=blocked, proposed=proposed
             )
 
         pid = _next_passport_id()
         try:
             db.execute(
                 "INSERT INTO passport (passport_id, status, passport_type, issue_date, "
-                "expiry_date, nat_idcard) VALUES (%s, 'pending', %s, %s, %s, %s)",
-                (pid, ptype, issue_d, expiry_d, cid),
+                "expiry_date, nat_idcard) VALUES (%s, 'pending', %s, NULL, NULL, %s)",
+                (pid, ptype, cid),
             )
         except MySQLError as e:
             flash(_mysql_message(e), "error")
             return render_template(
-                "passport.html", user=session, blocked=blocked
+                "passport.html", user=session, blocked=blocked, proposed=proposed
             )
 
         flash(f"Passport application {pid} submitted.", "success")
         return redirect(url_for("payment", kind="passport", ref=pid))
 
-    return render_template("passport.html", user=session, blocked=blocked)
+    return render_template(
+        "passport.html", user=session, blocked=blocked, proposed=proposed
+    )
 
 
 @app.route("/visa", methods=["GET", "POST"])
@@ -634,58 +709,57 @@ def visa():
         (cid,),
     )
 
+    proposed = {vtype: _proposed_visa_dates(vtype) for vtype in VISA_FEES}
+
     if request.method == "POST":
         passport_id = request.form.get("passport_id")
         visa_type = request.form.get("visa_type")
         destination = (request.form.get("destination") or "").strip()
-        issue_date = request.form.get("issue_date")
-        expiry_date = request.form.get("expiry_date")
 
-        if not all([passport_id, visa_type, destination, issue_date, expiry_date]):
+        if not all([passport_id, visa_type, destination]):
             flash("Please fill in all required fields.", "error")
-            return render_template("visa.html", eligible=eligible, user=session)
+            return render_template(
+                "visa.html", eligible=eligible, user=session, proposed=proposed
+            )
 
         if visa_type not in VISA_FEES:
             flash("Select a valid visa type.", "error")
-            return render_template("visa.html", eligible=eligible, user=session)
+            return render_template(
+                "visa.html", eligible=eligible, user=session, proposed=proposed
+            )
 
         if len(destination) < 2:
             flash("Enter a valid destination.", "error")
-            return render_template("visa.html", eligible=eligible, user=session)
-
-        issue_d, issue_err = _parse_date(issue_date, "Issue date")
-        if issue_err:
-            flash(issue_err, "error")
-            return render_template("visa.html", eligible=eligible, user=session)
-        expiry_d, expiry_err = _parse_date(expiry_date, "Expiry date")
-        if expiry_err:
-            flash(expiry_err, "error")
-            return render_template("visa.html", eligible=eligible, user=session)
-
-        if expiry_d <= issue_d:
-            flash("Expiry date must be after issue date.", "error")
-            return render_template("visa.html", eligible=eligible, user=session)
+            return render_template(
+                "visa.html", eligible=eligible, user=session, proposed=proposed
+            )
 
         own = any(p["passport_id"] == passport_id for p in eligible)
         if not own:
             flash("Select one of your eligible passports.", "error")
-            return render_template("visa.html", eligible=eligible, user=session)
+            return render_template(
+                "visa.html", eligible=eligible, user=session, proposed=proposed
+            )
 
         vid = _next_visa_id()
         try:
             db.execute(
                 "INSERT INTO visa (visa_id, visa_type, passport_id, destination, "
-                "issue_date, expiry_date, status) VALUES (%s,%s,%s,%s,%s,%s,'pending')",
-                (vid, visa_type, passport_id, destination, issue_d, expiry_d),
+                "issue_date, expiry_date, status) VALUES (%s,%s,%s,%s,NULL,NULL,'pending')",
+                (vid, visa_type, passport_id, destination),
             )
         except MySQLError as e:
             flash(_mysql_message(e), "error")
-            return render_template("visa.html", eligible=eligible, user=session)
+            return render_template(
+                "visa.html", eligible=eligible, user=session, proposed=proposed
+            )
 
         flash(f"Visa application #{vid} submitted.", "success")
         return redirect(url_for("payment", kind="visa", ref=str(vid)))
 
-    return render_template("visa.html", eligible=eligible, user=session)
+    return render_template(
+        "visa.html", eligible=eligible, user=session, proposed=proposed
+    )
 
 
 @app.route("/payment", methods=["GET", "POST"])
@@ -807,6 +881,7 @@ def help_page():
 
 # ── Staff routes ──────────────────────────────────────────────────────────────
 
+
 def _staff_redirect(default="staff"):
     nxt = request.form.get("next") or request.args.get("next")
     mapping = {
@@ -927,7 +1002,7 @@ def staff_passports():
     status = request.args.get("status") or ""
     passport_type = request.args.get("passport_type") or ""
     sql = (
-        "SELECT p.*, c.fname, c.lname FROM passport p "
+        "SELECT p.*, c.fname, c.lname, c.dob FROM passport p "
         "JOIN citizen c ON p.nat_idcard = c.nat_idcard WHERE 1=1"
     )
     params = []
@@ -946,6 +1021,11 @@ def staff_passports():
         params.append(passport_type)
     sql += " ORDER BY p.passport_id DESC LIMIT 100"
     rows = db.query(sql, tuple(params))
+
+    for r in rows:
+        proposed_issue, _ = _proposed_passport_dates(r["passport_type"], r.get("dob"))
+        r["proposed_issue_date"] = proposed_issue
+
     return render_template(
         "staff_passports.html",
         rows=rows,
@@ -955,6 +1035,7 @@ def staff_passports():
         user=session,
         role_rank=ROLE_RANK.get(session.get("role"), 0),
         active_nav="passports",
+        today=date.today(),
     )
 
 
@@ -995,6 +1076,8 @@ def staff_visas():
         user=session,
         role_rank=ROLE_RANK.get(session.get("role"), 0),
         active_nav="visas",
+        proposed_issue_date=date.today() + timedelta(days=30),
+        today=date.today(),
     )
 
 
@@ -1277,7 +1360,9 @@ def staff_officers():
                         "VALUES ('staff', %s, %s)",
                         (str(oid), generate_password_hash("password123")),
                     )
-                flash(f"Officer {oid} created (login password: password123).", "success")
+                flash(
+                    f"Officer {oid} created (login password: password123).", "success"
+                )
             elif action == "update":
                 n = db.execute(
                     "UPDATE immigration_officer SET fname=%s, lname=%s, position=%s, "
@@ -1337,9 +1422,7 @@ def staff_reports():
         reports["officer_perf"] = db.query(
             "SELECT * FROM vw_officer_performance LIMIT 30"
         )
-        reports["border_traffic"] = db.query(
-            "SELECT * FROM vw_border_traffic LIMIT 30"
-        )
+        reports["border_traffic"] = db.query("SELECT * FROM vw_border_traffic LIMIT 30")
         reports["citizen_summary"] = db.query(
             "SELECT * FROM vw_citizen_summary LIMIT 30"
         )
@@ -1382,7 +1465,9 @@ def staff_passport_status(passport_id):
     if new_status not in ("processing", "rejected"):
         flash("Invalid status.", "error")
         return _staff_redirect("passports")
-    allowed_from = ("pending",) if new_status == "processing" else ("pending", "processing")
+    allowed_from = (
+        ("pending",) if new_status == "processing" else ("pending", "processing")
+    )
     try:
         n = db.execute(
             "UPDATE passport SET status = %s "
@@ -1414,9 +1499,20 @@ def staff_passport_status(passport_id):
 def staff_passport_approve(passport_id):
     fee_paid = request.form.get("fee_paid") == "on"
     biometric = request.form.get("biometric_captured") == "on"
+    issue_date_raw = request.form.get("issue_date")
+
     if not fee_paid or not biometric:
         flash("Fee paid and biometric captured are both required to approve.", "error")
         return _staff_redirect("passports")
+
+    issue_d, issue_err = _parse_date(issue_date_raw, "Issue date")
+    if issue_err:
+        flash(issue_err, "error")
+        return _staff_redirect("passports")
+    if issue_d < date.today():
+        flash("Issue date cannot be in the past.", "error")
+        return _staff_redirect("passports")
+
     current = db.query(
         "SELECT status FROM passport WHERE passport_id = %s",
         (passport_id,),
@@ -1432,11 +1528,66 @@ def staff_passport_approve(passport_id):
         )
         return _staff_redirect("passports")
     try:
-        db.callproc("sp_approve_passport", (passport_id, fee_paid, biometric))
+        db.callproc("sp_approve_passport", (passport_id, fee_paid, biometric, issue_d))
         flash(f"Passport {passport_id} approved.", "success")
     except MySQLError as e:
         flash(_mysql_message(e), "error")
     return _staff_redirect("passports")
+
+
+@app.route("/staff/passport/<passport_id>/issue", methods=["POST"])
+@login_required
+@staff_required("supervisor")
+def staff_passport_issue(passport_id):
+    # mark an approved passport as issued and set issue/expiry dates
+    next_dest = request.form.get("next") or "passports"
+    issue_date_raw = request.form.get("issue_date") or None
+    try:
+        current = db.query(
+            "SELECT passport_id, passport_type, nat_idcard, status FROM passport WHERE passport_id = %s",
+            (passport_id,),
+            one=True,
+        )
+        if not current:
+            flash("Passport not found.", "error")
+            return _staff_redirect(next_dest)
+        if current["status"] != "approved":
+            flash(
+                f"Passport {passport_id} is {current['status']} — cannot mark as issued.",
+                "error",
+            )
+            return _staff_redirect(next_dest)
+
+        # determine issue_date and expiry_date
+        if issue_date_raw:
+            issue_d, err = _parse_date(issue_date_raw, "Issue date")
+            if err:
+                flash(err, "error")
+                return _staff_redirect(next_dest)
+        else:
+            issue_d = date.today()
+
+        citizen = db.query(
+            "SELECT dob FROM citizen WHERE nat_idcard = %s",
+            (current["nat_idcard"],),
+            one=True,
+        )
+        dob = citizen["dob"] if citizen else None
+        expiry_d = _add_years(
+            issue_d, _passport_validity_years(current.get("passport_type"), dob)
+        )
+
+        n = db.execute(
+            "UPDATE passport SET status = 'issued', issue_date = %s, expiry_date = %s WHERE passport_id = %s AND status = 'approved'",
+            (issue_d, expiry_d, passport_id),
+        )
+        if not n:
+            flash("Failed to mark passport as issued.", "error")
+        else:
+            flash(f"Passport {passport_id} marked as issued.", "success")
+    except MySQLError as e:
+        flash(_mysql_message(e), "error")
+    return _staff_redirect(next_dest)
 
 
 @app.route("/staff/visa/<int:visa_id>/status", methods=["POST"])
@@ -1447,18 +1598,53 @@ def staff_visa_status(visa_id):
     if new_status not in ("approved", "rejected"):
         flash("Invalid status.", "error")
         return _staff_redirect("visas")
-    try:
-        n = db.execute(
-            "UPDATE visa SET status = %s WHERE visa_id = %s AND status = 'pending'",
-            (new_status, visa_id),
-        )
-        if not n:
-            flash(
-                f"Visa #{visa_id} is not pending — cannot change status.",
-                "error",
+
+    if new_status == "rejected":
+        try:
+            n = db.execute(
+                "UPDATE visa SET status = 'rejected' WHERE visa_id = %s AND status = 'pending'",
+                (visa_id,),
             )
-        else:
-            flash(f"Visa #{visa_id} set to {new_status}.", "success")
+            if not n:
+                flash(
+                    f"Visa #{visa_id} is not pending — cannot change status.", "error"
+                )
+            else:
+                flash(f"Visa #{visa_id} set to rejected.", "success")
+        except MySQLError as e:
+            flash(_mysql_message(e), "error")
+        return _staff_redirect("visas")
+
+    issue_date_raw = request.form.get("issue_date")
+    issue_d, issue_err = _parse_date(issue_date_raw, "Issue date")
+    if issue_err:
+        flash(issue_err, "error")
+        return _staff_redirect("visas")
+    if issue_d < date.today():
+        flash("Issue date cannot be in the past.", "error")
+        return _staff_redirect("visas")
+
+    current = db.query(
+        "SELECT visa_type, status FROM visa WHERE visa_id = %s", (visa_id,), one=True
+    )
+    if not current:
+        flash("Visa not found.", "error")
+        return _staff_redirect("visas")
+    if current["status"] != "pending":
+        flash(
+            f"Visa #{visa_id} is already {current['status']} — cannot approve.", "error"
+        )
+        return _staff_redirect("visas")
+
+    expiry_d = _visa_expiry_date(current["visa_type"], issue_d)
+
+    try:
+        db.execute(
+            "UPDATE visa SET status = 'approved', issue_date = %s, expiry_date = %s "
+            "WHERE visa_id = %s AND status = 'pending'",
+            (issue_d, expiry_d, visa_id),
+        )
+        flash(f"Visa #{visa_id} approved.", "success")
     except MySQLError as e:
         flash(_mysql_message(e), "error")
     return _staff_redirect("visas")
@@ -1471,12 +1657,16 @@ def eligibility():
 
 @app.errorhandler(404)
 def not_found(_e):
-    return render_template("error.html", code=404, title="Page not found", user=session), 404
+    return render_template(
+        "error.html", code=404, title="Page not found", user=session
+    ), 404
 
 
 @app.errorhandler(500)
 def server_error(_e):
-    return render_template("error.html", code=500, title="Something went wrong", user=session), 500
+    return render_template(
+        "error.html", code=500, title="Something went wrong", user=session
+    ), 500
 
 
 def create_app():

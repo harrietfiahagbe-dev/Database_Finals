@@ -165,7 +165,7 @@
   }
 
   .fee-due strong {
-    font-family: 'Fraunces', serif;
+    font-family: 'Spectral', serif;
     font-size: 18px;
     color: var(--forest);
   }
@@ -304,8 +304,15 @@
           {% if blocked %}
           <div class="status-note warn" style="margin-bottom:18px;">
             <div>
+              {% if blocked.status == 'issued' %}
+              <div class="t">You already have a valid passport</div>
+              <div class="d">Passport {{ blocked.passport_id }} is issued and still valid for more than 6 months. You
+                can reapply closer to its expiry date.</div>
+              {% else %}
               <div class="t">Application already in progress</div>
-              <div class="d">Passport {{ blocked.passport_id }} is {{ blocked.status }}. You can only have one pending/processing passport at a time.</div>
+              <div class="d">Passport {{ blocked.passport_id }} is {{ blocked.status }}. You can only have one
+                pending/processing passport at a time.</div>
+              {% endif %}
             </div>
           </div>
           {% endif %}
@@ -338,23 +345,15 @@
             </div>
           </div>
 
-            <div class="app-row">
+          <div class="app-row">
             <div class="field disabled-field">
               <label>Proposed issue date <span class="locked-pill">Set by officer</span></label>
-              {% if proposed is defined and 'ordinary' in proposed and proposed['ordinary']|length > 0 %}
-                <input type="text" id="proposedIssueDate" value="{{ proposed['ordinary'][0].strftime('%d %b %Y') }}" disabled>
-              {% else %}
-                <input type="text" id="proposedIssueDate" value="" disabled>
-              {% endif %}
+              <input type="text" id="proposedIssueDate" value="{{ proposed['ordinary'][0].strftime('%d %b %Y') }}" disabled>
               <div class="hint">Estimated — the officer confirms the real date at approval.</div>
             </div>
             <div class="field disabled-field">
               <label>Proposed expiry date <span class="locked-pill">Set by officer</span></label>
-              {% if proposed is defined and 'ordinary' in proposed and proposed['ordinary']|length > 1 %}
-                <input type="text" id="proposedExpiryDate" value="{{ proposed['ordinary'][1].strftime('%d %b %Y') }}" disabled>
-              {% else %}
-                <input type="text" id="proposedExpiryDate" value="" disabled>
-              {% endif %}
+              <input type="text" id="proposedExpiryDate" value="{{ proposed['ordinary'][1].strftime('%d %b %Y') }}" disabled>
               <div class="hint">Based on passport type and your age on file.</div>
             </div>
           </div>
@@ -370,7 +369,9 @@
             <div class="form-footer-actions">
               <button class="btn btn-primary caps" type="submit" {% if blocked %}disabled{% endif %}>Continue to payment</button>
               {% if blocked %}
-              <p class="muted" style="margin:0;text-align:right;">Blocked — you already have a passport in progress.</p>
+              <p class="muted" style="margin:0;text-align:right;">
+                {% if blocked.status == 'issued' %}Blocked — you already have a valid passport.{% else %}Blocked — you already have a passport in progress.{% endif %}
+              </p>
               {% endif %}
             </div>
           </div>
@@ -428,14 +429,12 @@
 {% block scripts %}
 <script>
   const PROPOSED_DATES = {
-    {% if proposed is defined %}
-      {% for ptype, dates in proposed.items() %}
-      "{{ ptype }}": {
-        issue: "{{ dates[0].strftime('%d %b %Y') }}",
-        expiry: "{{ dates[1].strftime('%d %b %Y') }}"
-      }{% if not loop.last %},{% endif %}
-      {% endfor %}
-    {% endif %}
+    {% for ptype, dates in proposed.items() %}
+    "{{ ptype }}": {
+      issue: "{{ dates[0].strftime('%d %b %Y') }}",
+      expiry: "{{ dates[1].strftime('%d %b %Y') }}"
+    },
+    {% endfor %}
   };
 
   function syncPassportType() {
