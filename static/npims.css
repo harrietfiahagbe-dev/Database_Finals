@@ -3,9 +3,9 @@
 :root {
   --cream: #F7F3EC;
   --cream-2: #EFE9DC;
-  --forest: #1E4D3A;
-  --forest-deep: #153a2b;
-  --clay: #B5502E;
+  --forest: #1e1e1e;
+  --forest-deep: #1e1e1e;
+  --clay: #e43c29;
   --clay-light: #D9784F;
   --gold: #C9973F;
   --ink: #26251F;
@@ -34,7 +34,7 @@ html {
 }
 
 body {
-  font-family: "Work Sans", sans-serif;
+  font-family: "Roboto", sans-serif;
   background: var(--cream);
   color: var(--ink);
   line-height: 1.55;
@@ -42,7 +42,7 @@ body {
 }
 
 h1, h2, h3 {
-  font-family: "Fraunces", serif;
+  font-family: "Playfair Display", serif;
   font-weight: 600;
   letter-spacing: -0.01em;
   color: var(--forest);
@@ -90,21 +90,7 @@ button, input, select, textarea {
   color: var(--ink-soft);
 }
 
-/* —— Kente strip —— */
-.kente-strip {
-  height: 5px;
-  width: 100%;
-  background: linear-gradient(
-    90deg,
-    var(--forest) 0 20%,
-    var(--clay) 20% 40%,
-    var(--gold) 40% 60%,
-    var(--forest) 60% 80%,
-    var(--clay) 80% 100%
-  );
-  background-size: 200% 100%;
-  animation: shimmer 8s linear infinite;
-}
+
 
 @keyframes shimmer {
   from { background-position: 0% 0; }
@@ -113,7 +99,7 @@ button, input, select, textarea {
 
 /* —— Citizen header —— */
 .site-header {
-  background: rgba(247, 243, 236, 0.94);
+  background: rgba(255, 255, 255, 0.94);
   border-bottom: 1px solid var(--line);
   position: sticky;
   top: 0;
@@ -587,7 +573,7 @@ table.data td,
 .hero {
   position: relative;
   overflow: hidden;
-  background: radial-gradient(1200px 600px at 80% -10%, #234f3c 0%, var(--forest) 45%, var(--forest-deep) 100%);
+  background: radial-gradient(1200px 600px at 80% -10%, #000000 0%, var(--forest) 45%, var(--forest-deep) 100%);
   color: var(--cream);
   padding: 88px 0 110px;
 }
