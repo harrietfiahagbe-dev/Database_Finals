@@ -210,7 +210,7 @@
       <div>
         <span class="eyebrow caps">Citizen dashboard</span>
         <h1>Welcome Back, {{ person.fname }}</h1>
-        <p>Everything tied to your national ID in one place — applications, payments, and status, updated as officers
+        <p>Everything tied to your national ID in one place - applications, payments, and status, updated as officers
           process them.</p>
       </div>
       <div class="head-actions">
@@ -243,7 +243,7 @@
         <div class="stat-sub">{% if active_passport %}{{ active_passport.passport_id }}{% if active_passport.expiry_date %} &middot; expires {{ active_passport.expiry_date }}{% endif %} · from vw_citizen_summary{% else %}Apply to get started{% endif %}</div>
       </div>
       <div class="card stat-card">
-        <div class="stat-label">Active &amp; pending visas</div>
+        <div class="stat-label">Applied Visas</div>
         <div class="stat-num">{{ visas|length }}</div>
         <div class="stat-sub">{{ visas|selectattr('status','equalto','pending')|list|length }} pending review</div>
       </div>
