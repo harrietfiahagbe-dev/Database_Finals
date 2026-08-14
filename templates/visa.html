@@ -399,7 +399,7 @@
             <div class="field disabled-field">
               <label>Proposed issue date <span class="locked-pill">Set by officer</span></label>
               <input type="text" id="proposedIssueDate" value="{{ proposed['tourist'][0].strftime('%d %b %Y') }}" disabled>
-              <div class="hint">Estimated — 30 days from today, confirmed by the officer at approval.</div>
+              <div class="hint">Estimated - 30 days from today, confirmed by the officer at approval.</div>
             </div>
             <div class="field disabled-field">
               <label>Proposed expiry date <span class="locked-pill">Set by officer</span></label>
@@ -418,7 +418,7 @@
             <div class="form-footer-actions">
               <button class="btn btn-primary caps" type="submit" {% if not eligible %}disabled{% endif %}>Continue to payment</button>
               {% if not eligible %}
-              <p class="muted" style="margin:0;text-align:right;">Not eligible — need an issued passport valid 6+ months.</p>
+              <p class="muted" style="margin:0;text-align:right;">Not eligible - need an issued passport valid 6+ months.</p>
               {% endif %}
             </div>
           </div>

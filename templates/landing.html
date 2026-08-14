@@ -10,13 +10,11 @@
     <div class="service-cards">
       {% if user and user.account_type == 'citizen' %}
       <a class="service-card" href="{{ url_for('passport') }}">
-        <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="4" y="3" width="16" height="18" rx="2"/><line x1="8" y1="8" x2="16" y2="8"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
         <h3>Passport</h3>
         <p>New passport application</p>
         <span class="go">Apply for passport &rarr;</span>
       </a>
       <a class="service-card" href="{{ url_for('visa') }}">
-        <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M2 12h20M13 3c3 4 3 14 0 18M11 3C8 7 8 17 11 21"/></svg>
         <h3>Visa</h3>
         <p>Tourist, work, student, and more</p>
         <span class="go">Apply for visa &rarr;</span>
