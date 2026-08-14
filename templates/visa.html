@@ -396,14 +396,15 @@
           </div>
 
           <div class="app-row">
-            <div class="field">
-              <label>Requested issue date (demo) <span class="req">*</span></label>
-              <input type="date" name="issue_date" required>
+            <div class="field disabled-field">
+              <label>Proposed issue date <span class="locked-pill">Set by officer</span></label>
+              <input type="text" id="proposedIssueDate" value="{{ proposed['tourist'][0].strftime('%d %b %Y') }}" disabled>
+              <div class="hint">Estimated — 30 days from today, confirmed by the officer at approval.</div>
             </div>
-            <div class="field">
-              <label>Requested expiry date (demo) <span class="req">*</span></label>
-              <input type="date" name="expiry_date" required>
-              <div class="hint">Must be later than the issue date.</div>
+            <div class="field disabled-field">
+              <label>Proposed expiry date <span class="locked-pill">Set by officer</span></label>
+              <input type="text" id="proposedExpiryDate" value="{{ proposed['tourist'][1].strftime('%d %b %Y') }}" disabled>
+              <div class="hint">Based on the visa type selected above.</div>
             </div>
           </div>
 
@@ -461,6 +462,15 @@
 
 {% block scripts %}
 <script>
+  const PROPOSED_DATES = {
+    {% for vtype, dates in proposed.items() %}
+    "{{ vtype }}": {
+      issue: "{{ dates[0].strftime('%d %b %Y') }}",
+      expiry: "{{ dates[1].strftime('%d %b %Y') if dates[1] else '' }}"
+    },
+    {% endfor %}
+  };
+
   function syncPassportPick() {
     document.querySelectorAll('.passport-option').forEach(opt => {
       const input = opt.querySelector('input');
@@ -480,6 +490,12 @@
     document.querySelectorAll('#visaFeeTable tr[data-type]').forEach(row => {
       row.classList.toggle('active', row.dataset.type === checked.value);
     });
+
+    const dates = PROPOSED_DATES[checked.value];
+    if (dates) {
+      document.getElementById('proposedIssueDate').value = dates.issue;
+      document.getElementById('proposedExpiryDate').value = dates.expiry;
+    }
   }
 
   document.querySelectorAll('.passport-option').forEach(opt => {

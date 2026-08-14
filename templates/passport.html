@@ -339,15 +339,15 @@
           </div>
 
           <div class="app-row">
-            <div class="field">
-              <label>Requested issue date (demo) <span class="req">*</span></label>
-              <input type="date" name="issue_date" required>
-              <div class="hint">Date the passport takes effect.</div>
+            <div class="field disabled-field">
+              <label>Proposed issue date <span class="locked-pill">Set by officer</span></label>
+              <input type="text" id="proposedIssueDate" value="{{ proposed['ordinary'][0].strftime('%d %b %Y') }}" disabled>
+              <div class="hint">Estimated — the officer confirms the real date at approval.</div>
             </div>
-            <div class="field">
-              <label>Requested expiry date (demo) <span class="req">*</span></label>
-              <input type="date" name="expiry_date" required>
-              <div class="hint">Must be later than the issue date.</div>
+            <div class="field disabled-field">
+              <label>Proposed expiry date <span class="locked-pill">Set by officer</span></label>
+              <input type="text" id="proposedExpiryDate" value="{{ proposed['ordinary'][1].strftime('%d %b %Y') }}" disabled>
+              <div class="hint">Based on passport type and your age on file.</div>
             </div>
           </div>
 
@@ -419,6 +419,15 @@
 
 {% block scripts %}
 <script>
+  const PROPOSED_DATES = {
+    {% for ptype, dates in proposed.items() %}
+    "{{ ptype }}": {
+      issue: "{{ dates[0].strftime('%d %b %Y') }}",
+      expiry: "{{ dates[1].strftime('%d %b %Y') }}"
+    },
+    {% endfor %}
+  };
+
   function syncPassportType() {
     const checked = document.querySelector('input[name="passport_type"]:checked');
     if (!checked) return;
@@ -431,6 +440,12 @@
     document.querySelectorAll('#passportFeeTable tr[data-type]').forEach(row => {
       row.classList.toggle('active', row.dataset.type === checked.value);
     });
+
+    const dates = PROPOSED_DATES[checked.value];
+    if (dates) {
+      document.getElementById('proposedIssueDate').value = dates.issue;
+      document.getElementById('proposedExpiryDate').value = dates.expiry;
+    }
   }
 
   document.querySelectorAll('input[name="passport_type"]').forEach(input => {

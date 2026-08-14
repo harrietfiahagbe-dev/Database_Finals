@@ -272,7 +272,7 @@ SELECT * FROM Border_Post WHERE region IS NULL;
 
 
 /*Visa*/
-create table Visa ( visa_id INT PRIMARY KEY, visa_type VARCHAR(30) NOT NULL,  passport_id varchar(20) not null, destination VARCHAR(30) NOT NULL, issue_date DATE NOT NULL, expiry_date DATE NOT NULL, status VARCHAR(30) NOT NULL DEFAULT 'pending', CONSTRAINT chk_visa_type CHECK (visa_type IN ('work', 'student', 'tourist', 'transit', 'diplomatic')), CONSTRAINT chk_visa_dates CHECK (expiry_date > issue_date), CONSTRAINT chk_visa_status CHECK (status IN ('pending', 'approved', 'rejected')), CONSTRAINT fk_visa_passport FOREIGN KEY (passport_id) REFERENCES Passport(passport_id) ON DELETE RESTRICT ON UPDATE CASCADE);
+create table Visa ( visa_id INT PRIMARY KEY, visa_type VARCHAR(30) NOT NULL,  passport_id varchar(20) not null, destination VARCHAR(30) NOT NULL, issue_date DATE NULL, expiry_date DATE NULL, status VARCHAR(30) NOT NULL DEFAULT 'pending', CONSTRAINT chk_visa_type CHECK (visa_type IN ('work', 'student', 'tourist', 'transit', 'diplomatic')), CONSTRAINT chk_visa_dates CHECK (expiry_date > issue_date), CONSTRAINT chk_visa_status CHECK (status IN ('pending', 'approved', 'rejected')), CONSTRAINT fk_visa_passport FOREIGN KEY (passport_id) REFERENCES Passport(passport_id) ON DELETE RESTRICT ON UPDATE CASCADE);
 
 DELIMITER $$
  
@@ -296,24 +296,24 @@ END$$
 DELIMITER ;
 
 DELIMITER $$
-
 CREATE TRIGGER trg_check_passport_validity_insert
 BEFORE INSERT ON Visa
 FOR EACH ROW
 BEGIN
     DECLARE passport_expiry DATE;
-
-    SELECT expiry_date
-    INTO passport_expiry
-    FROM Passport
-    WHERE passport_id = NEW.passport_id;
-
-    IF passport_expiry < DATE_ADD(NEW.issue_date, INTERVAL 6 MONTH) THEN
-        SIGNAL SQLSTATE '45000'
-        SET MESSAGE_TEXT = 'Passport must be valid for at least 6 months from the visa issue date.';
+ 
+    IF NEW.issue_date IS NOT NULL THEN
+        SELECT expiry_date
+        INTO passport_expiry
+        FROM Passport
+        WHERE passport_id = NEW.passport_id;
+ 
+        IF passport_expiry < DATE_ADD(NEW.issue_date, INTERVAL 6 MONTH) THEN
+            SIGNAL SQLSTATE '45000'
+            SET MESSAGE_TEXT = 'Passport must be valid for at least 6 months from the visa issue date.';
+        END IF;
     END IF;
 END$$
-
 DELIMITER ;
 
 INSERT INTO Visa
@@ -681,62 +681,51 @@ DELIMITER ;
 
 
 DELIMITER //
-
 CREATE PROCEDURE sp_approve_passport(
     IN p_passport_id VARCHAR(20),
     IN p_fee_paid BOOLEAN,
-    IN p_biometric_captured BOOLEAN
+    IN p_biometric_captured BOOLEAN,
+    IN p_issue_date DATE
 )
 BEGIN
+    DECLARE v_ptype VARCHAR(50);
+    DECLARE v_dob DATE;
+    DECLARE v_years INT;
+    DECLARE v_expiry DATE;
+ 
     IF p_fee_paid = TRUE AND p_biometric_captured = TRUE THEN
+        IF p_issue_date < CURDATE() THEN
+            SIGNAL SQLSTATE '45000'
+            SET MESSAGE_TEXT = 'Issue date cannot be in the past.';
+        END IF;
+ 
+        SELECT p.passport_type, c.dob
+        INTO v_ptype, v_dob
+        FROM passport p
+        JOIN citizen c ON p.nat_idcard = c.nat_idcard
+        WHERE p.passport_id = p_passport_id;
+ 
+        IF v_ptype IN ('diplomatic', 'official') THEN
+            SET v_years = 5;
+        ELSEIF v_dob IS NOT NULL AND TIMESTAMPDIFF(YEAR, v_dob, p_issue_date) < 12 THEN
+            SET v_years = 5;
+        ELSE
+            SET v_years = 10;
+        END IF;
+ 
+        SET v_expiry = DATE_ADD(p_issue_date, INTERVAL v_years YEAR);
+ 
         UPDATE passport
-        SET status = 'approved'
+        SET status = 'approved',
+            issue_date = p_issue_date,
+            expiry_date = v_expiry
         WHERE passport_id = p_passport_id;
     ELSE
         SIGNAL SQLSTATE '45000'
         SET MESSAGE_TEXT = 'Passport cannot be approved: fee not paid or biometric capture missing';
     END IF;
 END //
-
 DELIMITER ;
-
-/*DEFINED FUNCTIONS
-A user-defined function that calculates a citizen's current age from their date of birth, 
-returning the age in years whenever it's called.*/
-SET GLOBAL log_bin_trust_function_creators = 1;
-
-DELIMITER //
-CREATE FUNCTION fn_calculate_age(dob DATE)
-RETURNS INT
-DETERMINISTIC
-BEGIN
-    RETURN TIMESTAMPDIFF(YEAR, dob, CURDATE());
-END //
-DELIMITER ;
-
-/*2.User-Defined Function ,fn_days_until_expiry takes a passport ID and returns a 
-single number which indicates the number of days left until that passport expires. */
-delimiter //
-
-create function fn_days_until_expiry(p_passport_id VARCHAR(20))
-returns int
-deterministic
-reads sql data
-begin
-    declare v_days int;
-    select datediff(expiry_date, curdate()) into v_days
-    from passport
-    where passport_id = p_passport_id;
-    return v_days;
-end //
-
-delimiter ;
-
-
-
-
-
-
 
 
 
@@ -1239,7 +1228,7 @@ SELECT COUNT(*) FROM app_account;  -- should return 10 demo logins
 SHOW TABLES;
 SELECT * FROM vw_citizen_summary LIMIT 5;
 
-/*CHECKING IF EVERYTHING IS THERE*/
+/*CHECKING IF EVERYTHING IS THERE just trying*/
 
 
 
