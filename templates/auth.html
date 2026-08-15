@@ -3,42 +3,87 @@
 {% block body_class %}auth-page{% endblock %}
 {% block extra_css %}
 <style>
+  body.auth-page {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    background: var(--ivory);
+  }
+
+  body.auth-page .site-header {
+    position: relative;
+    flex: none;
+  }
+
   .auth-shell {
+    flex: 1;
     display: grid;
-    grid-template-columns: 1fr 1fr;
-    align-items: stretch;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    min-height: 0;
   }
 
   @media (max-width: 860px) {
     .auth-shell {
       grid-template-columns: 1fr;
+      flex: none;
     }
     .auth-side {
       min-height: 0;
+      padding: 28px 24px 24px;
+      justify-content: flex-start;
+    }
+    .form-col {
+      align-items: stretch;
+      padding: 28px 20px 40px;
     }
   }
 
   .auth-side {
     background: var(--charcoal);
     color: var(--ivory);
-    padding: 36px 40px 32px;
+    padding: 48px 56px;
     position: relative;
     overflow: hidden;
     display: flex;
     flex-direction: column;
-    justify-content: flex-start;
-    gap: 28px;
+    justify-content: center;
+    gap: 32px;
+  }
+
+  .auth-side::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background-image: url('/static/hero-independence-arch.jpg');
+    background-size: cover;
+    background-position: 68% 30%;
+    opacity: 0.28;
+  }
+
+  .auth-side::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background:
+      linear-gradient(
+        105deg,
+        rgba(18, 23, 21, 0.94) 0%,
+        rgba(28, 33, 30, 0.88) 55%,
+        rgba(28, 33, 30, 0.72) 100%
+      );
+    pointer-events: none;
   }
 
   .auth-side .top {
     position: relative;
     z-index: 2;
+    max-width: 420px;
   }
 
   .coa-lg {
-    width: 48px;
-    height: 48px;
-    margin-bottom: 14px;
+    width: 52px;
+    height: 52px;
+    margin-bottom: 18px;
   }
 
   .auth-side .eyebrow {
@@ -46,32 +91,33 @@
     font-weight: 600;
     letter-spacing: 0.1em;
     color: var(--gold);
-    margin-bottom: 10px;
+    margin-bottom: 14px;
   }
 
   .auth-side h1 {
     font-family: "Public Sans", sans-serif;
-    font-size: 24px;
+    font-size: clamp(26px, 2.4vw, 34px);
     font-weight: 700;
     line-height: 1.18;
-    max-width: 320px;
-    margin-bottom: 10px;
+    max-width: 380px;
+    margin-bottom: 14px;
     color: var(--ivory);
-    letter-spacing: -0.01em;
+    letter-spacing: -0.02em;
   }
 
   .auth-side p {
-    font-size: 13.5px;
-    color: rgba(246, 241, 231, 0.65);
-    max-width: 300px;
-    line-height: 1.55;
+    font-size: 15px;
+    color: rgba(246, 241, 231, 0.72);
+    max-width: 360px;
+    line-height: 1.6;
   }
 
   .adinkra-field {
     position: absolute;
     inset: 0;
-    opacity: .06;
+    opacity: .07;
     pointer-events: none;
+    z-index: 1;
   }
 
   .adinkra-field svg {
@@ -113,18 +159,20 @@
     position: relative;
     z-index: 2;
     font-size: 11px;
-    color: rgba(246, 241, 231, 0.4);
-    border-top: 1px solid rgba(246, 241, 231, .1);
-    padding-top: 14px;
+    color: rgba(246, 241, 231, 0.45);
+    border-top: 1px solid rgba(246, 241, 231, .12);
+    padding-top: 16px;
     margin-top: 0;
+    max-width: 420px;
   }
 
   .form-col {
     display: flex;
-    align-items: flex-start;
+    align-items: center;
     justify-content: center;
-    padding: 36px 32px 48px;
+    padding: 32px 40px;
     background: var(--ivory);
+    overflow-y: auto;
   }
 
   .auth-card {
@@ -487,3 +535,4 @@
   });
 </script>
 {% endblock %}
+{% block footer %}{% endblock %}
