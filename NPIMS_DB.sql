@@ -1,7 +1,9 @@
 DROP DATABASE IF EXISTS NPIMS;
-CREATE DATABASE NPIMS CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+CREATE DATABASE NPIMS;
 USE NPIMS;
-SET NAMES utf8mb4;
+
+
+*/Citizen*/
 create table citizen(
 	nat_idcard int primary key,
 	fname varchar (50) not null,
@@ -13,7 +15,6 @@ create table citizen(
 
 alter table citizen
 add constraint check_gender check(gender in ('M','F'));
-
 describe citizen;
 insert into citizen 
 values
@@ -48,11 +49,9 @@ values
 (100000029, 'Kwesi',    'Amankwah',  'M', 'kwesi.amankwah@gmail.com',  'BA-034-9967'),
 (100000030, 'Adwoa',    'Sackey',    'F', 'adwoa.sackey@gmail.com',    'GA-411-2853');
 
-select * from citizen ;
+
 select count(*) from citizen;
-select nat_idcard,fname
-from citizen 
-where gender ='F';
+select nat_idcard,fname from citizen  where gender ='F';
 
 update citizen 
 set home_address = "CR-756-9087"
@@ -97,6 +96,7 @@ UPDATE citizen SET dob = '1991-12-20' WHERE nat_idcard = 100000030;
 
 SELECT COUNT(*) FROM citizen WHERE dob IS NULL;
 
+*/Passport*/
 create table passport (
 	passport_id varchar(20) unique primary key ,
 	status varchar(20) not null default 'pending'
@@ -110,11 +110,8 @@ create table passport (
 			   references citizen(nat_idcard)
 			   on delete restrict
 );
-
 alter table passport 
 modify column passport_id varchar(20) not null;
-
-
 
 DELIMITER $$
 CREATE TRIGGER trg_one_pending_passport
@@ -135,7 +132,6 @@ BEGIN
     END IF;
 END$$
 DELIMITER ;
-
 
 insert into passport
  values
@@ -172,16 +168,12 @@ insert into passport
 ( 'G0100030', 'issued',    'ordinary',    '2021-05-19', '2031-05-18', 100000030);
 
 select * from passport;
-
 select count(*) from passport;
-
 select passport_id from passport
 where passport_type = "diplomatic";
-
 update passport
 set status = 'approved'
 where passport_id = 'G0100023B';
-
 update passport
 set status = 'issued',
     issue_date = '2026-08-07',
@@ -263,9 +255,6 @@ UPDATE Border_Post SET region = 'Oti' WHERE post_id = 28;
 UPDATE Border_Post SET region = 'Greater Accra' WHERE post_id = 29; 
 UPDATE Border_Post SET region = 'Volta' WHERE post_id = 30; 
 
-
-
-
 SELECT * FROM Border_Post; 
 SELECT * FROM Border_Post WHERE post_id = 21;
 SELECT * FROM Border_Post WHERE region IS NULL; 
@@ -273,7 +262,6 @@ SELECT * FROM Border_Post WHERE region IS NULL;
 
 /*Visa*/
 create table Visa ( visa_id INT PRIMARY KEY, visa_type VARCHAR(30) NOT NULL,  passport_id varchar(20) not null, destination VARCHAR(30) NOT NULL, issue_date DATE NULL, expiry_date DATE NULL, status VARCHAR(30) NOT NULL DEFAULT 'pending', CONSTRAINT chk_visa_type CHECK (visa_type IN ('work', 'student', 'tourist', 'transit', 'diplomatic')), CONSTRAINT chk_visa_dates CHECK (expiry_date > issue_date), CONSTRAINT chk_visa_status CHECK (status IN ('pending', 'approved', 'rejected')), CONSTRAINT fk_visa_passport FOREIGN KEY (passport_id) REFERENCES Passport(passport_id) ON DELETE RESTRICT ON UPDATE CASCADE);
-
 DELIMITER $$
  
 CREATE TRIGGER trg_check_passport_validity_update
@@ -319,14 +307,12 @@ DELIMITER ;
 INSERT INTO Visa
 VALUES
 (1,  'tourist', 	'G0100001',  'United States', '2023-02-01', '2023-08-01', 'approved'), (2,  'student', 	'G0100002',  'Canada',    	'2022-08-15', '2026-08-14', 'approved'), (3,  'tourist', 	'G0100004',  'France',    	'2023-03-10', '2023-09-10', 'approved'), (4,  'work',    	'G0100006',  'United Kingdom','2021-01-20', '2024-01-20', 'approved'), (5,  'diplomatic',  'G0100007',  'Belgium',   	'2023-01-15', '2026-01-15', 'approved'), (6,  'tourist', 	'G0100009',  'South Africa',  '2022-05-10', '2022-11-10', 'approved'), (7,  'student',     'G0100011',  'Germany',   	'2021-06-01', '2025-06-01', 'approved'), (8,  'tourist', 	'G0100013',  'Kenya',     	'2023-07-15', '2024-01-15', 'approved'),(9,  'work',    	'G0100015',  'Qatar',     	'2023-02-20', '2025-02-20', 'approved'), (10, 'tourist',     'G0100016',  'Italy',     	'2022-09-01', '2023-03-01', 'approved'), (11, 'diplomatic',  'G0100018',  'Switzerland',   '2022-04-15', '2024-04-15', 'approved'), (12, 'tourist', 	'G0100019',  'Spain',     	'2023-05-20', '2023-11-20', 'approved'), (13, 'work',        'G0100021',  'United Arab Emirates','2021-10-10','2024-10-10','approved'), (14, 'diplomatic', 'G0100022', 'Nigeria', '2023-01-05', '2024-01-05', 'approved'), (15, 'tourist', 	'G0100024',  'Brazil',    	'2022-01-12', '2022-07-12', 'approved'), (16, 'student',     'G0100026',  'Australia', 	'2021-09-09', '2025-09-09', 'approved'), (17, 'diplomatic',  'G0100027',  'Ethiopia',  	'2023-06-18', '2026-06-18', 'approved'), (18, 'tourist', 	'G0100028',  'Morocco',   	'2023-03-15', '2023-09-15', 'approved'), (19, 'work',    	'G0100030',  'Japan',     	'2022-02-02', '2025-02-02', 'approved'), (20, 'tourist',     'G0100001',  'Togo',      	'2024-01-05', '2024-07-05', 'pending'), (21, 'work',        'G0100002',  'Ireland',   	'2024-03-15', '2027-03-15', 'pending'), (22, 'student', 	'G0100004',  'Netherlands',   '2024-05-01', '2028-05-01', 'pending'), (23, 'tourist', 	'G0100006',  'Egypt',     	'2023-08-12', '2024-02-12', 'rejected'), (24, 'tourist',     'G0100009',  'Singapore', 	'2024-01-18', '2024-07-18', 'pending'), (25, 'work',    	'G0100013',  'China',     	'2024-02-20', '2026-02-20', 'approved'), (26, 'student',     'G0100015',  'Malaysia',  	'2024-06-01', '2028-06-01', 'pending'), (27, 'tourist', 	'G0100019',  'Turkey',    	'2024-04-10', '2024-10-10', 'approved'), (28, 'work',        'G0100024',  'Norway',    	'2023-11-15', '2026-11-15', 'rejected'), (29, 'tourist',     'G0100028',  'India',     	'2024-02-05', '2024-08-05', 'pending'), (30, 'student',     'G0100030',  'United States', '2024-07-01', '2028-07-01', 'approved');
-
 UPDATE Visa SET passport_id = 'G0100004' WHERE visa_id = 1;  
 UPDATE Visa SET status = 'approved' WHERE visa_id = 20;
 
 
 /*Immigration Officer*/
 CREATE TABLE Immigration_Officer ( officer_id INT PRIMARY KEY, fname VARCHAR(30) NOT NULL, lname VARCHAR(30) NOT NULL, position VARCHAR(30) NOT NULL, phone_number VARCHAR(30) NOT NULL, post_id INT NOT NULL, CONSTRAINT chk_officer_position CHECK (position IN ('officer', 'senior officer', 'supervisor', 'director')), CONSTRAINT fk_officer_post FOREIGN KEY (post_id) REFERENCES Border_Post(post_id) ON DELETE RESTRICT ON UPDATE CASCADE );
-
 
 INSERT INTO Immigration_Officer
 (officer_id, fname, lname, position, phone_number, post_id)
@@ -407,9 +393,6 @@ INSERT INTO payment (nat_idcard, passport_id, visa_id, amount, status, payment_d
 (100000027, NULL, 17, 150.00, 'completed', '2023-06-10', 'cash'),
 (100000030, NULL, 19, 150.00, 'completed', '2022-01-28', 'mobile money');
 
-
-
-
 Select * from payment;
 Select * from payment where status = 'failed';
 Select * from payment where payment_method = 'mobile money';
@@ -419,20 +402,11 @@ Select payment_method, count(*) as Total from payment group by payment_method;
 Select sum(amount) as Total_Mobile_Money from payment where payment_method = 'mobile money';
 
 
-
-
-
-
-
-
-
+*/Travel Records*/
 CREATE TABLE Travel_Record ( record_id INT PRIMARY KEY AUTO_INCREMENT, nat_idcard INT NOT NULL, passport_id VARCHAR(20) NOT NULL, post_id INT NOT NULL, officer_id INT NOT NULL, entry_exit VARCHAR(10) NOT NULL CHECK (entry_exit IN ('entry', 'exit')), `timestamp` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP, destination_country VARCHAR(50) NOT NULL, FOREIGN KEY (nat_idcard) REFERENCES Citizen(nat_idcard), FOREIGN KEY (passport_id) REFERENCES Passport(passport_id), FOREIGN KEY (post_id) REFERENCES Border_Post(post_id), FOREIGN KEY (officer_id) REFERENCES Immigration_Officer(officer_id) ); 
-
 
 ALTER TABLE Travel_Record 
 ADD purpose_of_travel VARCHAR(50); 
-
-
 
 INSERT INTO Travel_Record (nat_idcard, passport_id, post_id, officer_id, entry_exit, `timestamp`, destination_country, purpose_of_travel) VALUES
 (100000001, 'G0100001', 1,  1,  'exit',  '2023-02-01 08:15:00', 'United States', 'tourism'),
@@ -466,26 +440,20 @@ INSERT INTO Travel_Record (nat_idcard, passport_id, post_id, officer_id, entry_e
 (100000028, 'G0100028', 8,  8,  'exit',  '2024-02-06 06:45:00', 'India', 'tourism'),
 (100000030, 'G0100030', 1,  1,  'exit',  '2024-07-02 08:00:00', 'United States', 'education');
 
-
-
 SELECT * FROM Travel_Record; 
 SELECT COUNT(*) FROM Travel_Record; 
 SELECT * FROM Travel_Record WHERE entry_exit = 'exit'; 
 
-
-
 UPDATE Travel_Record 
 SET purpose_of_travel = 'family visit' 
 WHERE record_id = 3; 
-
-
 
 DELETE FROM Travel_Record WHERE record_id = 30; 
 SELECT COUNT(*) FROM Travel_Record; 
 
 
 
-
+*/QUERIES*/
 /*Displaying officers who logged more travel records than average
 */
 select immigration_officer.officer_id, immigration_officer.fname, immigration_officer.lname, 
@@ -720,14 +688,7 @@ END //
 DELIMITER ;
 
 
-
-
-
-
-
 /*TRIGGERS*/
-
-
 /*Automatically updates a passport's status to "processing" whenever its linked payment is 
 updated to "completed", enforcing the payment-to-passport rule without anyone doing it manually. */
 DELIMITER //
@@ -745,7 +706,6 @@ DELIMITER ;
 
 
 /*Phase 7*/
-
 DROP USER IF EXISTS
   'kwame.mensah'@'localhost',
   'akosua.asare'@'localhost',
@@ -1038,7 +998,7 @@ SELECT COUNT(*) FROM app_account;  -- should return 10 demo logins
 SHOW TABLES;
 SELECT * FROM vw_citizen_summary LIMIT 5;
 
-/*CHECKING IF EVERYTHING IS THERE */
+
 
 
 
