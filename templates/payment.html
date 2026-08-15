@@ -2,10 +2,10 @@
 {% block title %}NPIMS — Payment{% endblock %}
 {% block extra_css %}
 <style>
-  .pay-wrap { max-width: 520px; margin: 36px auto 60px; padding: 0 24px; }
-  .pay-wrap .eyebrow { border: none; padding: 0; color: var(--clay); margin-bottom: 8px; }
-  .amount { font-family: 'Spectral', serif; font-size: 36px; color: var(--forest); margin: 16px 0; }
-  .pay-wrap h1 { font-size: 28px; }
+  .pay-wrap { max-width: 480px; margin: 32px auto 60px; padding: 0 24px; }
+  .pay-wrap .eyebrow { border: none; padding: 0; color: var(--muted); font-size: 10.5px; font-weight: 700; letter-spacing: 0.1em; margin-bottom: 8px; }
+  .amount { font-family: "IBM Plex Mono", monospace; font-size: 32px; font-weight: 600; color: var(--charcoal); margin: 14px 0; }
+  .pay-wrap h1 { font-family: "Public Sans", sans-serif; font-size: 24px; font-weight: 700; color: var(--charcoal); letter-spacing: -0.01em; }
 </style>
 {% endblock %}
 {% block content %}
@@ -26,10 +26,9 @@
         <select id="payment_method" name="payment_method" required>
           <option value="mobile money">Mobile money</option>
           <option value="card">Card</option>
-          <option value="cash">Cash</option>
         </select>
       </div>
-      <button class="btn btn-clay btn-block caps" type="submit">Record payment</button>
+      <button class="btn btn-gold btn-block caps" type="submit">Record payment</button>
     </form>
     <p style="text-align:center;margin-top:16px;">
       <a class="btn btn-ghost btn-sm" href="{{ url_for('citizen') }}">Back to dashboard</a>

@@ -4,8 +4,8 @@
 <style>
   .app-layout {
     display: grid;
-    grid-template-columns: 1fr 340px;
-    gap: 32px;
+    grid-template-columns: 1fr 320px;
+    gap: 28px;
     align-items: start;
   }
 
@@ -16,77 +16,91 @@
   }
 
   .page-head {
-    margin-bottom: 30px;
+    margin-bottom: 26px;
   }
 
   .page-head .eyebrow {
-    font-size: 11.5px;
-    color: var(--clay);
+    font-size: 10.5px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    color: var(--muted);
     margin-bottom: 8px;
     display: block;
   }
 
   .page-head h1 {
-    font-size: 30px;
+    font-family: "Public Sans", sans-serif;
+    font-size: 26px;
+    font-weight: 700;
     margin-bottom: 0;
+    color: var(--charcoal);
+    letter-spacing: -0.01em;
   }
 
   .page-head p {
-    font-size: 13.5px;
+    font-size: 13px;
+    color: var(--muted);
     margin-top: 8px;
     margin-bottom: 0;
-    max-width: 520px;
+    max-width: 500px;
+    line-height: 1.5;
   }
 
   .breadcrumb {
-    font-size: 12px;
-    color: var(--ink-soft);
-    margin-bottom: 18px;
+    font-size: 11.5px;
+    color: var(--muted);
+    margin-bottom: 16px;
   }
 
   .breadcrumb a {
-    color: var(--clay);
+    color: var(--charcoal);
+    font-weight: 600;
+    transition: color var(--transition);
+  }
+
+  .breadcrumb a:hover {
+    color: var(--green);
   }
 
   .status-note {
     display: flex;
-    gap: 12px;
+    gap: 11px;
     align-items: flex-start;
-    background: var(--cream-2);
-    border: 1px solid var(--line);
+    background: var(--cream);
+    border: 1px solid var(--border);
     border-radius: 10px;
-    padding: 14px 16px;
-    margin-bottom: 26px;
+    padding: 13px 15px;
+    margin-bottom: 22px;
   }
 
   .status-note svg {
-    width: 18px;
-    height: 18px;
-    color: var(--clay);
+    width: 17px;
+    height: 17px;
+    color: var(--gold);
     flex: none;
     margin-top: 2px;
   }
 
   .status-note .t {
-    font-size: 12.5px;
-    font-weight: 500;
-    color: var(--forest);
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--charcoal);
     margin-bottom: 2px;
   }
 
   .status-note .d {
-    font-size: 12px;
-    color: var(--ink-soft);
+    font-size: 11.5px;
+    color: var(--muted);
   }
 
   .field label .req {
-    color: var(--clay);
+    color: var(--red);
   }
 
   .app-row {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 16px;
+    gap: 14px;
   }
 
   @media (max-width: 520px) {
@@ -96,40 +110,41 @@
   }
 
   .passport-option {
-    border: 1px solid var(--line);
+    border: 1px solid var(--border);
     border-radius: 10px;
-    padding: 14px 16px;
+    padding: 13px 15px;
     display: flex;
     align-items: center;
     justify-content: space-between;
     cursor: pointer;
-    margin-bottom: 10px;
-    transition: border-color .15s ease, background .15s ease;
+    margin-bottom: 8px;
+    transition: border-color var(--transition), background var(--transition);
   }
 
   .passport-option.selected {
-    border-color: var(--forest);
-    background: var(--cream-2);
+    border-color: var(--charcoal);
+    background: var(--cream);
   }
 
   .passport-option .left .id {
-    font-weight: 500;
-    color: var(--forest);
-    font-size: 13.5px;
+    font-weight: 600;
+    color: var(--charcoal);
+    font-size: 13px;
   }
 
   .passport-option .left .exp {
-    font-size: 11.5px;
-    color: var(--ink-soft);
+    font-size: 11px;
+    color: var(--muted);
     margin-top: 2px;
   }
 
   .eligible-tag {
-    font-size: 10px;
+    font-size: 9.5px;
+    font-weight: 600;
     text-transform: uppercase;
-    letter-spacing: .05em;
-    color: var(--ok);
-    background: #E8F0EA;
+    letter-spacing: .06em;
+    color: var(--green);
+    background: rgba(7, 91, 70, 0.08);
     padding: 3px 9px;
     border-radius: 100px;
   }
@@ -151,21 +166,21 @@
   }
 
   .type-option {
-    border: 1px solid var(--line);
+    border: 1px solid var(--border);
     border-radius: 10px;
-    padding: 14px;
+    padding: 13px;
     cursor: pointer;
-    transition: border-color .15s ease, background .15s ease;
+    transition: border-color var(--transition), background var(--transition);
     display: block;
   }
 
   .type-option:hover {
-    border-color: var(--forest);
+    border-color: var(--charcoal);
   }
 
   .type-option.selected {
-    border-color: var(--forest);
-    background: var(--cream-2);
+    border-color: var(--charcoal);
+    background: var(--cream);
   }
 
   .type-option input {
@@ -173,51 +188,54 @@
   }
 
   .type-option .name {
-    font-size: 13.5px;
-    font-weight: 500;
-    color: var(--forest);
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--charcoal);
   }
 
   .type-option .desc {
-    font-size: 11px;
-    color: var(--ink-soft);
+    font-size: 10.5px;
+    color: var(--muted);
     margin-top: 3px;
   }
 
   .type-option .price {
-    font-size: 12px;
-    font-weight: 600;
-    color: var(--clay);
+    font-size: 11.5px;
+    font-weight: 700;
+    color: var(--gold);
     margin-top: 8px;
   }
 
   .fee-due {
-    margin-top: 14px;
-    padding: 12px 14px;
+    margin-top: 12px;
+    padding: 11px 13px;
     border-radius: 10px;
-    background: var(--cream-2);
-    border: 1px solid var(--line);
+    background: var(--cream);
+    border: 1px solid var(--border);
     display: flex;
     justify-content: space-between;
     align-items: center;
-    font-size: 13px;
+    font-size: 12.5px;
+    color: var(--muted);
   }
 
   .fee-due strong {
-    font-family: 'Spectral', serif;
-    font-size: 18px;
-    color: var(--forest);
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--charcoal);
   }
 
   .fee-table {
     width: 100%;
     border-collapse: collapse;
-    font-size: 12.5px;
+    font-size: 12px;
   }
 
   .fee-table td {
-    padding: 8px 0;
-    border-bottom: 1px solid var(--line);
+    padding: 7px 0;
+    border-bottom: 1px solid var(--border);
+    color: var(--muted);
   }
 
   .fee-table tr:last-child td {
@@ -226,43 +244,43 @@
 
   .fee-table td:last-child {
     text-align: right;
-    font-weight: 500;
-    color: var(--forest);
+    font-weight: 600;
+    color: var(--charcoal);
   }
 
   .fee-table tr.active td {
-    background: #E8F0EA;
-    color: var(--forest);
+    background: rgba(212, 154, 42, 0.08);
+    color: var(--charcoal);
     font-weight: 500;
   }
 
   .disabled-field {
-    opacity: .55;
+    opacity: .5;
   }
 
   .locked-pill {
     display: inline-flex;
     align-items: center;
     gap: 5px;
-    font-size: 10.5px;
-    color: var(--ink-soft);
-    background: var(--cream-2);
+    font-size: 10px;
+    color: var(--muted);
+    background: var(--cream);
     padding: 3px 9px;
     border-radius: 100px;
     margin-left: 8px;
     text-transform: none;
     letter-spacing: 0;
-    font-weight: 400;
+    font-weight: 500;
   }
 
   .form-footer {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: 16px;
+    gap: 14px;
     margin-top: 8px;
-    padding-top: 22px;
-    border-top: 1px solid var(--line);
+    padding-top: 20px;
+    border-top: 1px solid var(--border);
     flex-wrap: wrap;
   }
 
@@ -274,33 +292,36 @@
   }
 
   .side-card {
-    margin-bottom: 20px;
+    margin-bottom: 18px;
   }
 
   .side-card h3 {
-    font-size: 15px;
-    margin-bottom: 12px;
+    font-family: "Public Sans", sans-serif;
+    font-size: 14px;
+    font-weight: 700;
+    margin-bottom: 10px;
+    color: var(--charcoal);
   }
 
   .rule-list {
     list-style: none;
     display: flex;
     flex-direction: column;
-    gap: 12px;
+    gap: 10px;
   }
 
   .rule-list li {
     display: flex;
-    gap: 10px;
-    font-size: 12.5px;
-    color: var(--ink-soft);
+    gap: 9px;
+    font-size: 12px;
+    color: var(--muted);
     align-items: flex-start;
   }
 
   .rule-list svg {
-    width: 16px;
-    height: 16px;
-    color: var(--forest);
+    width: 15px;
+    height: 15px;
+    color: var(--green);
     flex: none;
     margin-top: 2px;
   }
@@ -346,7 +367,7 @@
               <span class="eligible-tag">Eligible</span>
             </label>
             {% else %}
-            <div class="hint" style="color:var(--clay);">No eligible issued passports. You need an issued passport valid for 6+ months.</div>
+            <div class="hint" style="color:var(--red);">No eligible issued passports. You need an issued passport valid for 6+ months.</div>
             {% endfor %}
           </div>
 
@@ -354,31 +375,31 @@
             <label>Visa type <span class="req">*</span></label>
             <div class="type-options" id="visaTypeOptions">
               <label class="type-option selected">
-                <input type="radio" name="visa_type" value="tourist" data-fee="100" checked>
+                <input type="radio" name="visa_type" value="tourist" data-fee="100" data-days="90" checked>
                 <div class="name">Tourist</div>
                 <div class="desc">Short stay / leisure</div>
                 <div class="price">GH₵ 100</div>
               </label>
               <label class="type-option">
-                <input type="radio" name="visa_type" value="work" data-fee="150">
+                <input type="radio" name="visa_type" value="work" data-fee="150" data-days="365">
                 <div class="name">Work</div>
                 <div class="desc">Employment travel</div>
                 <div class="price">GH₵ 150</div>
               </label>
               <label class="type-option">
-                <input type="radio" name="visa_type" value="student" data-fee="120">
+                <input type="radio" name="visa_type" value="student" data-fee="120" data-days="365">
                 <div class="name">Student</div>
                 <div class="desc">Study abroad</div>
                 <div class="price">GH₵ 120</div>
               </label>
               <label class="type-option">
-                <input type="radio" name="visa_type" value="transit" data-fee="80">
+                <input type="radio" name="visa_type" value="transit" data-fee="80" data-days="14">
                 <div class="name">Transit</div>
                 <div class="desc">Passing through</div>
                 <div class="price">GH₵ 80</div>
               </label>
               <label class="type-option">
-                <input type="radio" name="visa_type" value="diplomatic" data-fee="200">
+                <input type="radio" name="visa_type" value="diplomatic" data-fee="200" data-days="365">
                 <div class="name">Diplomatic</div>
                 <div class="desc">Official mission</div>
                 <div class="price">GH₵ 200</div>
@@ -391,19 +412,25 @@
           </div>
 
           <div class="field">
-            <label>Destination country <span class="req">*</span></label>
-            <input type="text" name="destination" placeholder="United Kingdom" required>
+            <label for="destination">Destination country <span class="req">*</span></label>
+            <select id="destination" name="destination" required>
+              <option value="" disabled selected>Select a country</option>
+              {% for country in destinations %}
+              <option value="{{ country }}">{{ country }}</option>
+              {% endfor %}
+            </select>
           </div>
 
           <div class="app-row">
-            <div class="field">
-              <label>Requested issue date (demo) <span class="req">*</span></label>
-              <input type="date" name="issue_date" required>
+            <div class="field disabled-field">
+              <label>Proposed issue date <span class="locked-pill">Set automatically</span></label>
+              <input type="date" name="issue_date" id="proposedIssueDate" value="{{ proposed_issue }}" readonly>
+              <div class="hint">Generated from today’s date.</div>
             </div>
-            <div class="field">
-              <label>Requested expiry date (demo) <span class="req">*</span></label>
-              <input type="date" name="expiry_date" required>
-              <div class="hint">Must be later than the issue date.</div>
+            <div class="field disabled-field">
+              <label>Proposed expiry <span class="locked-pill">Set automatically</span></label>
+              <input type="date" name="expiry_date" id="proposedExpiryDate" value="{{ proposed_expiry }}" readonly>
+              <div class="hint">Tourist 90 days · transit 14 days · work, student and diplomatic 1 year.</div>
             </div>
           </div>
 
@@ -468,6 +495,12 @@
     });
   }
 
+  function addDays(isoDate, days) {
+    const d = new Date(isoDate + 'T00:00:00');
+    d.setDate(d.getDate() + Number(days || 90));
+    return d.toISOString().slice(0, 10);
+  }
+
   function syncVisaType() {
     const checked = document.querySelector('input[name="visa_type"]:checked');
     if (!checked) return;
@@ -480,6 +513,11 @@
     document.querySelectorAll('#visaFeeTable tr[data-type]').forEach(row => {
       row.classList.toggle('active', row.dataset.type === checked.value);
     });
+    const issue = document.getElementById('proposedIssueDate');
+    const expiry = document.getElementById('proposedExpiryDate');
+    if (issue && expiry) {
+      expiry.value = addDays(issue.value, checked.dataset.days);
+    }
   }
 
   document.querySelectorAll('.passport-option').forEach(opt => {

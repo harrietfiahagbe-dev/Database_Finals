@@ -1,7 +1,7 @@
 """NPIMS Flask application — wired to MySQL."""
 
 import os
-from datetime import datetime, date
+from datetime import datetime, date, timedelta
 from functools import wraps
 
 try:
@@ -60,7 +60,47 @@ VISA_FEES = {
     "diplomatic": 200.00,
     "transit": 80.00,
 }
-PAYMENT_METHODS = {"mobile money", "card", "cash"}
+PAYMENT_METHODS = {"mobile money", "card"}
+PASSPORT_VALIDITY_YEARS = {"ordinary": 10, "official": 5, "diplomatic": 5}
+VISA_VALIDITY_DAYS = {
+    "tourist": 90,
+    "work": 365,
+    "student": 365,
+    "diplomatic": 365,
+    "transit": 14,
+}
+DESTINATION_COUNTRIES = (
+    "United Kingdom",
+    "United States",
+    "Canada",
+    "Germany",
+    "France",
+    "Italy",
+    "Spain",
+    "Netherlands",
+    "Belgium",
+    "Ireland",
+    "Switzerland",
+    "Sweden",
+    "Norway",
+    "Denmark",
+    "Portugal",
+    "United Arab Emirates",
+    "Saudi Arabia",
+    "Qatar",
+    "South Africa",
+    "Nigeria",
+    "Kenya",
+    "Côte d'Ivoire",
+    "Togo",
+    "Benin",
+    "Burkina Faso",
+    "China",
+    "India",
+    "Japan",
+    "Australia",
+    "Brazil",
+)
 POST_TYPES = {"air", "land", "sea"}
 OFFICER_POSITIONS = set(POSITION_TO_ROLE.keys())
 ENTRY_EXIT = {"entry", "exit"}
@@ -83,6 +123,25 @@ def _parse_date(value, label="Date"):
         return date.fromisoformat(value), None
     except ValueError:
         return None, f"{label} is invalid."
+
+
+def _add_years(start, years):
+    try:
+        return start.replace(year=start.year + years)
+    except ValueError:
+        return start.replace(year=start.year + years, month=2, day=28)
+
+
+def _proposed_passport_dates(passport_type):
+    issue = date.today()
+    years = PASSPORT_VALIDITY_YEARS.get(passport_type, 10)
+    return issue, _add_years(issue, years)
+
+
+def _proposed_visa_dates(visa_type):
+    issue = date.today()
+    days = VISA_VALIDITY_DAYS.get(visa_type, 90)
+    return issue, issue + timedelta(days=days)
 
 
 # ── Auth helpers ──────────────────────────────────────────────────────────────
@@ -563,6 +622,17 @@ def passport():
         (cid,),
         one=True,
     )
+    def passport_form():
+        proposed_issue, proposed_expiry = _proposed_passport_dates("ordinary")
+        return render_template(
+            "passport.html",
+            user=session,
+            blocked=blocked,
+            proposed_issue=proposed_issue.isoformat(),
+            proposed_expiry=proposed_expiry.isoformat(),
+            passport_validity_years=PASSPORT_VALIDITY_YEARS,
+        )
+
     if request.method == "POST":
         if blocked:
             flash(
@@ -570,34 +640,12 @@ def passport():
                 f"{blocked['status']}. Finish or wait for that one first.",
                 "error",
             )
-            return render_template(
-                "passport.html", user=session, blocked=blocked
-            )
+            return passport_form()
         ptype = request.form.get("passport_type", "ordinary")
-        issue_date = request.form.get("issue_date") or None
-        expiry_date = request.form.get("expiry_date") or None
         if ptype not in PASSPORT_FEES:
             flash("Select a valid passport type.", "error")
-            return render_template(
-                "passport.html", user=session, blocked=blocked
-            )
-        issue_d, issue_err = _parse_date(issue_date, "Issue date")
-        if issue_err:
-            flash(issue_err, "error")
-            return render_template(
-                "passport.html", user=session, blocked=blocked
-            )
-        expiry_d, expiry_err = _parse_date(expiry_date, "Expiry date")
-        if expiry_err:
-            flash(expiry_err, "error")
-            return render_template(
-                "passport.html", user=session, blocked=blocked
-            )
-        if expiry_d <= issue_d:
-            flash("Expiry date must be after issue date.", "error")
-            return render_template(
-                "passport.html", user=session, blocked=blocked
-            )
+            return passport_form()
+        issue_d, expiry_d = _proposed_passport_dates(ptype)
 
         pid = _next_passport_id()
         try:
@@ -608,14 +656,12 @@ def passport():
             )
         except MySQLError as e:
             flash(_mysql_message(e), "error")
-            return render_template(
-                "passport.html", user=session, blocked=blocked
-            )
+            return passport_form()
 
         flash(f"Passport application {pid} submitted.", "success")
         return redirect(url_for("payment", kind="passport", ref=pid))
 
-    return render_template("passport.html", user=session, blocked=blocked)
+    return passport_form()
 
 
 @app.route("/visa", methods=["GET", "POST"])
@@ -635,38 +681,39 @@ def visa():
         passport_id = request.form.get("passport_id")
         visa_type = request.form.get("visa_type")
         destination = (request.form.get("destination") or "").strip()
-        issue_date = request.form.get("issue_date")
-        expiry_date = request.form.get("expiry_date")
 
-        if not all([passport_id, visa_type, destination, issue_date, expiry_date]):
+        def visa_form():
+            proposed_issue, proposed_expiry = _proposed_visa_dates(
+                visa_type if visa_type in VISA_FEES else "tourist"
+            )
+            return render_template(
+                "visa.html",
+                eligible=eligible,
+                user=session,
+                destinations=DESTINATION_COUNTRIES,
+                visa_validity_days=VISA_VALIDITY_DAYS,
+                proposed_issue=proposed_issue.isoformat(),
+                proposed_expiry=proposed_expiry.isoformat(),
+            )
+
+        if not all([passport_id, visa_type, destination]):
             flash("Please fill in all required fields.", "error")
-            return render_template("visa.html", eligible=eligible, user=session)
+            return visa_form()
 
         if visa_type not in VISA_FEES:
             flash("Select a valid visa type.", "error")
-            return render_template("visa.html", eligible=eligible, user=session)
+            return visa_form()
 
-        if len(destination) < 2:
-            flash("Enter a valid destination.", "error")
-            return render_template("visa.html", eligible=eligible, user=session)
+        if destination not in DESTINATION_COUNTRIES:
+            flash("Select a valid destination country.", "error")
+            return visa_form()
 
-        issue_d, issue_err = _parse_date(issue_date, "Issue date")
-        if issue_err:
-            flash(issue_err, "error")
-            return render_template("visa.html", eligible=eligible, user=session)
-        expiry_d, expiry_err = _parse_date(expiry_date, "Expiry date")
-        if expiry_err:
-            flash(expiry_err, "error")
-            return render_template("visa.html", eligible=eligible, user=session)
-
-        if expiry_d <= issue_d:
-            flash("Expiry date must be after issue date.", "error")
-            return render_template("visa.html", eligible=eligible, user=session)
+        issue_d, expiry_d = _proposed_visa_dates(visa_type)
 
         own = any(p["passport_id"] == passport_id for p in eligible)
         if not own:
             flash("Select one of your eligible passports.", "error")
-            return render_template("visa.html", eligible=eligible, user=session)
+            return visa_form()
 
         vid = _next_visa_id()
         try:
@@ -677,12 +724,21 @@ def visa():
             )
         except MySQLError as e:
             flash(_mysql_message(e), "error")
-            return render_template("visa.html", eligible=eligible, user=session)
+            return visa_form()
 
         flash(f"Visa application #{vid} submitted.", "success")
         return redirect(url_for("payment", kind="visa", ref=str(vid)))
 
-    return render_template("visa.html", eligible=eligible, user=session)
+    proposed_issue, proposed_expiry = _proposed_visa_dates("tourist")
+    return render_template(
+        "visa.html",
+        eligible=eligible,
+        user=session,
+        destinations=DESTINATION_COUNTRIES,
+        visa_validity_days=VISA_VALIDITY_DAYS,
+        proposed_issue=proposed_issue.isoformat(),
+        proposed_expiry=proposed_expiry.isoformat(),
+    )
 
 
 @app.route("/payment", methods=["GET", "POST"])
